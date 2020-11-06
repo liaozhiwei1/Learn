@@ -13,16 +13,16 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  **/
 public class Locks3 {
 
-    int a = 0;
+    volatile int a = 0;
     ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
 
     public static void main(String[] args) {
         Locks3 locks1 = new Locks3();
         for (int i = 0; i < 10; i++) {
-            new Thread(() -> {locks1.add();},i+"").start();
+            new Thread(() -> locks1.add(),i+"").start();
         }
-        for (int i = 10; i < 20; i++) {
-            new Thread(() -> {locks1.get();},i+"").start();
+        for (int i = 10; i < 200; i++) {
+            new Thread(() -> locks1.get(),i+"").start();
         }
     }
 
@@ -44,7 +44,7 @@ public class Locks3 {
         try {
             this.readWriteLock.readLock().lock();
             System.out.println(Thread.currentThread().getName() + "获取读锁");
-            System.out.println(a);
+//            System.out.println(a);
         } finally {
             System.out.println(Thread.currentThread().getName() + "释放读锁");
             this.readWriteLock.readLock().unlock();
