@@ -125,5 +125,7 @@ class queue1 {
                 }
             }
         }).start();
+
+        //1.0  synchronized wait() notifyAll()
     }
 }
