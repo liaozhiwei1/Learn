@@ -1,7 +1,5 @@
 package Atomic;
 
-import Locks.Locks4;
-
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.atomic.AtomicStampedReference;
 
