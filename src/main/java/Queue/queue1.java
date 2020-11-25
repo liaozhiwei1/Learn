@@ -10,10 +10,12 @@ import java.util.concurrent.locks.ReentrantLock;
  * @description: 基于阻塞队列     生产消费者模式，消息组件的基本原理，线程池
  *               线程   操作   资源类
  *               判断   干活   通知
- *               放置虚假唤醒机制
+ *               防止虚假唤醒机制
  *               1.0: synchronized -> wait -> notify
  *               2.0: lock -> await -> sinqal
  *               3.0: BlockingQueue（自动睡眠和唤起线程）
+ *
+ *               synchronized 锁升级  无锁-》偏向锁-》轻量级锁(不动用cpu进行分配的锁，如自旋锁) -》 重量级锁
  *
  *               synchronized和lock的区别
  *               1.synchronized是关键字属于jvm层面   lock是具体类(java.util.concurrent.locks) 属于api层面

@@ -1,8 +1,9 @@
 package Thread;
 
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.FutureTask;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * @version: 1.0
@@ -15,7 +16,9 @@ class Thread1 implements Runnable{
 
     @Override
     public void run() {
-
+        Collections.synchronizedList(new ArrayList<>());
+        AtomicReference atomicReference = new AtomicReference(new ArrayList<>());
+        CopyOnWriteArrayList<Object> objects = new CopyOnWriteArrayList<>();
     }
 }
 //2
