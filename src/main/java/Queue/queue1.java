@@ -1,9 +1,8 @@
 package Queue;
 
+import java.util.AbstractQueue;
 import java.util.concurrent.*;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.*;
 
 /**
  * @version: 1.0
@@ -51,7 +50,7 @@ class Resource {
         }
     }
 }
-
+//线程唤醒等待的方法，1.wait notify =》 sync    2.await signal => lock   3.park unpark =>lockSupport
 class Resource1{
     private volatile int number = 0;
     private Lock lock = new ReentrantLock();
@@ -63,6 +62,7 @@ class Resource1{
             //判断
             while (number != 0){
                 condition.await();
+                LockSupport.park();
             }
             //干活
             number++;
@@ -127,7 +127,6 @@ class queue1 {
                 }
             }
         }).start();
-
         //1.0  synchronized wait() notifyAll()
     }
 }

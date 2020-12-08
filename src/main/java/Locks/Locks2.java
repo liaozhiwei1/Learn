@@ -30,6 +30,7 @@ public class Locks2 {
                 e.printStackTrace();
             }
         }).start();
+        locks.syncAdd();
     }
 
     public void add() throws InterruptedException {
@@ -54,5 +55,14 @@ public class Locks2 {
             this.lock1.unlock();
             System.out.println("del释放lock1成功");
         }
+    }
+
+    public synchronized void syncAdd(){
+        System.out.println("sync获取锁");
+        syncDel();
+    }
+
+    public synchronized void syncDel(){
+        System.out.println("再次获取sync锁");
     }
 }
