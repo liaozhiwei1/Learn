@@ -11,11 +11,16 @@ import org.springframework.stereotype.Service;
  **/
 @Service
 public class ServiceA {
-
-    @Autowired
-    public ServiceB serviceB;
+//    @Autowired
+//    public ServiceB serviceB;
 
     public ServiceA() {
         System.out.println("serviceA init（）");
     }
+
+
+    public void test(){
+        System.out.println("test");
+    }
+
 }

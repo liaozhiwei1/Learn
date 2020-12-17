@@ -5,17 +5,17 @@ import org.springframework.stereotype.Service;
 
 /**
  * @version: 1.0
- * @description:
+ * @description: \
  * @author: zhiwei.liao
- * @create: 2020-12-04 17:30:17
+ * @create: 2020-12-04 17:30:01
  **/
 @Service
-public class ServiceB {
-
+public class ServiceC {
     @Autowired
-    public ServiceC serviceC;
+    public ServiceA serviceA;
 
-    public ServiceB() {
-        System.out.println("serviceB init（）");
+    public ServiceC() {
+        System.out.println("serviceC init（）");
     }
+
 }

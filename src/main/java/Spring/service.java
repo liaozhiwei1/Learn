@@ -13,6 +13,7 @@ public class service {
 
     public int div(int x, int y) {
         int res = x / y;
+        Class<service> serviceClass = service.class;
         System.out.println("=============service 执行 div 结果为" + res);
         return res;
     }
