@@ -1,18 +1,18 @@
 package MyBatis;
 
 import Dto.UserDto;
+import org.apache.ibatis.executor.Executor;
+import org.apache.ibatis.executor.SimpleExecutor;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
-import org.springframework.jdbc.datasource.SimpleDriverDataSource;
+import org.apache.ibatis.transaction.Transaction;
+import org.apache.ibatis.transaction.jdbc.JdbcTransaction;
 
-import javax.sql.DataSource;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
-import java.sql.Driver;
+import java.sql.Connection;
+import java.sql.DriverManager;
 
 /**
  * @version: 1.0
@@ -26,9 +26,13 @@ import java.sql.Driver;
  **/
 public class Mybatis {
 
-    public static void main(String[] args) throws FileNotFoundException {
+    public static void main(String[] args) throws Exception {
         SqlSessionFactoryBuilder sqlSessionFactoryBuilder = new SqlSessionFactoryBuilder();
-        SqlSessionFactory build = sqlSessionFactoryBuilder.build(new FileReader("mybatis.xml"));
+        SqlSessionFactory build = sqlSessionFactoryBuilder.build(new FileReader("D:\\ross最新\\Learn\\src\\main\\resources\\mybatis.xml"));
         Configuration configuration = build.getConfiguration();
+        Connection connection = DriverManager.getConnection("","","");
+        Transaction transaction = new JdbcTransaction(connection);
+        SimpleExecutor simpleExecutor = new SimpleExecutor(configuration, transaction);
+        simpleExecutor.
     }
 }
