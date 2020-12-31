@@ -17,6 +17,9 @@ public class LiaoBeanFactoryPostProcess implements BeanFactoryPostProcessor {
     @Override
     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
         BeanDefinition serviceA = beanFactory.getBeanDefinition("serviceA");
+        System.out.println(serviceA.getScope());
+        serviceA.setParentName("service");
+//        beanFactory.getBean("serviceA");
 //        serviceA.setScope("SCOPE_SINGLETON");
     }
 }
