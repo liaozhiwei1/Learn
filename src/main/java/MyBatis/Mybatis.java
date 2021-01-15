@@ -1,23 +1,15 @@
-/*
 package MyBatis;
 
-import Dto.UserDto;
-import org.apache.ibatis.executor.Executor;
-import org.apache.ibatis.executor.ReuseExecutor;
-import org.apache.ibatis.executor.SimpleExecutor;
-import org.apache.ibatis.session.*;
-import org.apache.ibatis.transaction.Transaction;
-import org.apache.ibatis.transaction.jdbc.JdbcTransaction;
+
+import org.apache.ibatis.session.Configuration;
+import org.apache.ibatis.session.SqlSessionFactory;
+import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import org.json.JSONObject;
 
-import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.util.HashMap;
 import java.util.Map;
 
-*/
 /**
  * @version: 1.0
  * @description:
@@ -27,7 +19,7 @@ import java.util.Map;
  *
  * @author: zhiwei.liao
  * @create: 2020-12-04 11:45:28
- **//*
+ **/
 
 public class Mybatis {
 
@@ -35,11 +27,15 @@ public class Mybatis {
         FileReader reader = new FileReader("D:\\ross最新\\Learn\\src\\main\\resources\\mybatis.xml");
         SqlSessionFactoryBuilder sqlSessionFactoryBuilder = new SqlSessionFactoryBuilder();
         SqlSessionFactory build = sqlSessionFactoryBuilder.build(reader);
-//        Configuration configuration = build.getConfiguration();
-//        configuration.addMapper(testMapper.class);
+        Configuration configuration = build.getConfiguration();
+        configuration.addMapper(testMapper.class);
         testMapper mapper = build.openSession().getMapper(testMapper.class);
+
         JSONObject jsonObject = mapper.find(1318750478217375744l);
         Map map  = new HashMap();
     }
+
+    public void doQuery(){
+
+    }
 }
-*/

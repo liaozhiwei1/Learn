@@ -31,6 +31,7 @@ class Resource {
     public Resource(BlockingQueue<String> queue) {
         this.queue = queue;
     }
+
     public void produce(String message) {
         for (int a = 0; a < 5; a++) {
             try {
@@ -76,7 +77,6 @@ class Resource1{
     }
 
     public void customer() throws InterruptedException {
-
         try {
             lock.lock();
             //判断

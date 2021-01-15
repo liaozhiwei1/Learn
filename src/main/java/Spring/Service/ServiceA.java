@@ -1,5 +1,6 @@
 package Spring.Service;
 
+import MyBatis.testMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +14,9 @@ import org.springframework.stereotype.Service;
 public class ServiceA {
 //    @Autowired
 //    public ServiceB serviceB;
+
+    @Autowired
+    public testMapper testMapper;
 
     public ServiceA() {
         System.out.println("serviceA init（）");
