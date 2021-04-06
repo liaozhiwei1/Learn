@@ -375,9 +375,9 @@ public class Solution {
      */
     public int[] exchange(int[] nums) {
         for (int i = 0; i < nums.length; i++) {
-            if ((nums[i]&1)==0){
-                for (int j = i+1 ; j < nums.length; j++) {
-                    if ((nums[j]&1)==1){
+            if ((nums[i] & 1) == 0) {
+                for (int j = i + 1; j < nums.length; j++) {
+                    if ((nums[j] & 1) == 1) {
                         int temp = nums[i];
                         nums[i] = nums[j];
                         nums[j] = temp;
@@ -391,21 +391,22 @@ public class Solution {
 
     /**
      * 输入一个链表，输出该链表中倒数第k个节点。为了符合大多数人的习惯，本题从1开始计数，即链表的尾节点是倒数第1个节点。例如，一个链表有6个节点，从头节点开始，它们的值依次是1、2、3、4、5、6。这个链表的倒数第3个节点是值为4的节点
-     *
+     * <p>
      * 来源：力扣（LeetCode）
      * 链接：https://leetcode-cn.com/problems/lian-biao-zhong-dao-shu-di-kge-jie-dian-lcof
      * 著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。
+     *
      * @param head
      * @param k
      * @return
      */
     public ListNode getKthFromEnd(ListNode head, int k) {
         Stack<ListNode> stack = new Stack<>();
-        while (head != null){
+        while (head != null) {
             stack.push(head);
             head = head.next;
         }
-        for (int i = 0; i < k-1; i++) {
+        for (int i = 0; i < k - 1; i++) {
             stack.pop();
         }
         return stack.pop();
@@ -413,12 +414,13 @@ public class Solution {
 
     /**
      * 定义一个函数，输入一个链表的头节点，反转该链表并输出反转后链表的头节点。
+     *
      * @param head
      * @return
      */
     public ListNode reverseList(ListNode head) {
         ListNode listNode = null;
-        while (head!=null){
+        while (head != null) {
             ListNode next = head.next;
             head.next = listNode;
             listNode = head;
@@ -427,12 +429,45 @@ public class Solution {
         return listNode;
     }
 
+    /**
+     * 给你一个有序数组 nums ，请你 原地 删除重复出现的元素，使每个元素 最多出现两次 ，返回删除后数组的新长度。
+     * <p>
+     * 不要使用额外的数组空间，你必须在 原地 修改输入数组 并在使用 O(1) 额外空间的条件下完成。
+     *
+     * 思路，将piont 看成需要填数据的位置，依次往后填新数据
+     * @param nums
+     * @return
+     */
 
+    public int removeDuplicates(int[] nums) {
+        int point = 0;
+        int count = 1;
+        for (int i = 0; i < nums.length; i++) {
+            if (i == 0){
+                point ++;
+                continue;
+            }
+            if (nums[i-1] == nums[i]){
+                count++;
+                if (count>2){
+                    continue;
+                }else {
+                    nums[point] = nums[i];
+                    point++;
+                }
+            }else {
+                count = 1;
+                nums[point] = nums[i];
+                point++;
+            }
+        }
+        return point;
+    }
 
     public static void main(String[] args) {
         Solution solution = new Solution();
-        System.out.println(solution.myPow(2.00000,
-                4));
+        int[] nums = {1,1,1,2,2,3,3,3};
+        System.out.println(solution.removeDuplicates(nums));
     }
 
 

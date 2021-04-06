@@ -7,16 +7,17 @@ import IO.DealHeader.impl.ReaderHeaderImpl;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.net.ServerSocket;
-import java.net.SocketAddress;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
-import java.nio.channels.SocketChannel;
 import java.util.Iterator;
 
 /**
- * 单Reator模式提供接口处理
+ * Reator模式提供接口处理
+ * 1.单Reator 单线程：reator和处理业务是同一线程 （一层）
+ * 2.单Reator 多线程：reator是一个线程处理业务逻辑交由线程池 （两层）
+ * 3.主从Reator 多线程：主Reator只处理连接请求，从Reator处理读写请求（多线程） 多线程处理业务  （三层）
+ * 4.netty主要基于主从Reator多线程模型
  */
 public class sampReator {
 
@@ -48,7 +49,6 @@ public class sampReator {
                             //TODO 写数据请求处
                         }
                     }finally {
-
                         iterator.remove();
                     }
                 }
