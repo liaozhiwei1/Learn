@@ -8,7 +8,7 @@ import io.netty.util.CharsetUtil;
 
 import java.nio.charset.StandardCharsets;
 
-public class ChannelServerHeader extends ChannelInboundHandlerAdapter {
+public class  ChannelServerHeader extends ChannelInboundHandlerAdapter {
 
     /**
      *
@@ -17,7 +17,7 @@ public class ChannelServerHeader extends ChannelInboundHandlerAdapter {
      * @throws Exception
      */
     @Override
-    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+    public void channelRead(ChannelHandlerContext ctx, Object msg){
         System.out.println("server ctx = "+ctx);
         System.out.println("客户端消息 " + ((ByteBuf)msg).toString(CharsetUtil.UTF_8));
     }

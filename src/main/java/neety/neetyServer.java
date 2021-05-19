@@ -9,6 +9,8 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import neety.DealHeader.ChannelServerHeader;
 
+import java.util.HashMap;
+
 public class neetyServer {
 
     public static void main(String[] args) throws InterruptedException {
@@ -30,9 +32,9 @@ public class neetyServer {
                             socketChannel.pipeline().addLast(new ChannelServerHeader());  //加入处理header
                         }
                     });
-
             //开始子线程处理
-            ChannelFuture sync = b.bind(6666).sync();
+            ChannelFuture sync = b.bind(6666);
+            sync.sync();
 
             //监听通道关闭时间
             sync.channel().closeFuture().sync();

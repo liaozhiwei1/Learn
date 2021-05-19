@@ -12,6 +12,14 @@ public class UserDto {
 
     private Integer old;
 
+    public UserDto(String userName, Integer old) {
+        this.userName = userName;
+        this.old = old;
+    }
+
+    public UserDto() {
+    }
+
     public String getUserName() {
         return userName;
     }
