@@ -1,8 +1,11 @@
 package LeetCode;
 
+import org.springframework.util.ObjectUtils;
+
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.*;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.function.BinaryOperator;
+import java.util.stream.Collectors;
 
 /**
  * @version: 1.0
@@ -1095,14 +1098,13 @@ public class Solution {
     //背包问题  0、1
     public int zeroOnePackExecutor1st(int N, int V, int[] v, int[] w) {
         int[] dp = new int[V + 1];
-        //初始状态
-        for (int i = 0; i < V + 1; i++) {
-            dp[i] = 0;
-        }
-
+        dp[0] = 0;
+        /*for (int i = 0; i < coins.length+1; i++) {
+            dp[i][0] = 0;
+        }*/
         for (int i = 1; i < N + 1; i++) {
-            for (int j = 1; j < V + 1; j++) {
-                dp[j] = Math.max(dp[j], j - v[i - 1] < 0 ? 0 : dp[j - v[i - 1]] + w[i - 1]);
+            for (int j = v[i - 1]; j < V + 1; j++) {
+                dp[j] = Math.max(dp[j], dp[j - v[i - 1]] + w[i - 1]);
             }
         }
         return dp[V];
@@ -1158,15 +1160,1558 @@ public class Solution {
             WW[i] = newW.get(i);
         }
         //转化为01背包问题
-       return zeroOnePackExecutor1st(VV.length,maxVolume,VV,WW);
+        return zeroOnePackExecutor1st(VV.length, maxVolume, VV, WW);
+    }
+
+    /**
+     * https://leetcode-cn.com/problems/top-k-frequent-words/
+     *
+     * @param words
+     * @param k
+     * @return
+     */
+    public List<String> topKFrequent(String[] words, int k) {
+        Map<String, Integer> map = new HashMap<>();
+        for (String word : words) {
+            map.put(word, map.getOrDefault(word, 0) + 1);
+        }
+        List<String> strings = new ArrayList<>(map.keySet());
+        Collections.sort(strings, (o1, o2) -> map.get(o1).equals(map.get(o2)) ? o1.compareTo(o2) : map.get(o2) - (map.get(o1)));
+        return strings.subList(0, k);
+    }
+
+    /**
+     * https://leetcode-cn.com/problems/binary-number-with-alternating-bits/
+     *
+     * @param n
+     * @return
+     */
+    public boolean hasAlternatingBits(int n) {
+        char[] chars = Integer.toBinaryString(n).toCharArray();
+        for (int i = 0; i < chars.length - 1; i++) {
+            if (chars[i] == chars[i + 1]) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * https://leetcode-cn.com/problems/max-area-of-island/
+     *
+     * @param grid
+     * @return
+     */
+    public int maxAreaOfIsland(int[][] grid) {
+        boolean[][] flag = new boolean[grid.length][grid[0].length];
+        int max = 0;
+        int count = 0;
+        for (int i = 0; i < grid.length; i++) {
+            for (int j = 0; j < grid[i].length; j++) {
+                if (!flag[i][j] && grid[i][j] == 1) {
+                    max = Math.max(doMaxAreaOfIsland(grid, i, j, count, flag), max);
+                    count = 0;
+                } else {
+                    flag[i][j] = true;
+                }
+            }
+        }
+        return max;
+    }
+
+    public int doMaxAreaOfIsland(int[][] grid, int x, int y, int max, boolean[][] flag) {
+        if (grid[x][y] != 0) {
+            flag[x][y] = true;
+            ++max;
+            if (x + 1 < grid.length && !flag[x + 1][y]) {
+                max = doMaxAreaOfIsland(grid, x + 1, y, max, flag);
+            }
+            if (x - 1 >= 0 && !flag[x - 1][y]) {
+                max = doMaxAreaOfIsland(grid, x - 1, y, max, flag);
+            }
+            if (y + 1 < grid[x].length && !flag[x][y + 1]) {
+                max = doMaxAreaOfIsland(grid, x, y + 1, max, flag);
+            }
+            if (y - 1 >= 0 && !flag[x][y - 1]) {
+                max = doMaxAreaOfIsland(grid, x, y - 1, max, flag);
+            }
+        }
+        return max;
+    }
+
+    public int kthLargestValue(int[][] matrix, int k) {
+        int[][] max = new int[matrix.length][matrix[0].length];
+        List<Integer> integers = new ArrayList<>();
+        for (int i = 0; i < matrix.length; i++) {
+            for (int j = 0; j < matrix[i].length; j++) {
+                max[i][j] = matrix[i][j];
+                if (i - 1 >= 0) {
+                    max[i][j] = max[i][j] ^ max[i - 1][j];
+                }
+                if (j - 1 >= 0) {
+                    max[i][j] = max[i][j] ^ max[i][j - 1];
+                }
+                if (i - 1 >= 0 && j - 1 >= 0) {
+                    max[i][j] = max[i][j] ^ max[i - 1][j - 1];
+                }
+                integers.add(max[i][j]);
+            }
+        }
+
+        Collections.sort(integers);
+        return integers.get(integers.size() - k);
+    }
+
+    /**
+     * https://leetcode-cn.com/problems/uncrossed-lines/
+     *
+     * @param nums1
+     * @param nums2
+     * @return
+     */
+    public int maxUncrossedLines(int[] nums1, int[] nums2) {
+        int nums1Length = nums1.length + 1;
+        int nums2Length = nums2.length + 1;
+        int[][] flag = new int[nums1Length][nums2Length];
+        for (int i = 0; i < nums1Length; i++) {
+            flag[i][0] = 0;
+        }
+        for (int i = 0; i < nums2Length; i++) {
+            flag[0][i] = 0;
+        }
+        for (int i = 1; i < nums1Length; i++) {
+            for (int j = 1; j < nums2Length; j++) {
+                if (nums1[i - 1] == nums2[j - 1]) {
+                    flag[i][j] = 1;
+                    flag[i][j] += flag[i - 1][j - 1];
+                } else {
+                    flag[i][j] = Math.max(flag[i - 1][j], flag[i][j - 1]);
+                }
+            }
+        }
+        return flag[nums1Length - 1][nums2Length - 1];
+    }
+
+    /**
+     * https://leetcode-cn.com/problems/count-triplets-that-can-form-two-arrays-of-equal-xor/
+     *
+     * @param arr
+     * @return
+     */
+    public int countTriplets(int[] arr) {
+        int count = 0;
+        int dp = 0;
+        for (int i = 0; i < arr.length; i++) {
+            for (int j = i; j < arr.length; j++) {
+                if (i == j) {
+                    dp = arr[j];
+                } else {
+                    dp = dp ^ arr[j];
+                    if (dp == 0) {
+                        count += (j - i);
+                    }
+                }
+            }
+        }
+        return count;
+    }
+
+    /**
+     * https://leetcode-cn.com/problems/strange-printer/
+     */
+    public int strangePrinter(String s) {
+        char[] chars = s.toCharArray();
+        int[][] dp = new int[s.length()][s.length()];
+        for (int i = s.length() - 1; i >= 0; i--) {
+            dp[i][i] = 1;
+            for (int j = i + 1; j < s.length(); j++) {
+                if (chars[i] == chars[j]) {
+                    dp[i][j] = dp[i][j - 1];
+                } else {
+                    int min = Integer.MAX_VALUE;
+                    for (int k = i; k < j; k++) {
+                        min = Math.min(min, dp[i][k] + dp[k + 1][j]);
+                    }
+                    dp[i][j] = min;
+                }
+            }
+        }
+        return dp[0][s.length() - 1];
+    }
+
+
+    /**
+     * https://leetcode-cn.com/problems/non-decreasing-array/
+     *
+     * @param nums
+     * @return
+     */
+    public boolean checkPossibility(int[] nums) {
+        int count = 0;
+        for (int i = 0; i < nums.length - 1; i++) {
+            if (i + 1 < nums.length && nums[i] > nums[i + 1]) {
+                count++;
+                if (count > 1) {
+                    return false;
+                }
+            }
+            if (i - 1 > 0 && i + 1 < nums.length && nums[i - 1] == nums[i + 1]) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * https://leetcode-cn.com/problems/beautiful-arrangement-ii/
+     *
+     * @param n
+     * @param k
+     * @return
+     */
+    public int[] constructArray(int n, int k) {
+        int[] a = new int[n];
+        a[0] = 1;
+        int count = 1;
+        int j = -1;
+        for (int i = k; i > 0; i--) {
+            a[count] = Math.abs(i - a[count - 1] * j);
+            j = -j;
+            count++;
+        }
+        for (int i = a[1] + 1; i <= n; i++) {
+            a[count] = i;
+            count++;
+        }
+        return a;
+    }
+
+    /**
+     * https://leetcode-cn.com/problems/make-the-xor-of-all-segments-equal-to-zero/
+     * 答案未完成
+     *
+     * @param nums
+     * @param k
+     * @return
+     */
+    public int minChanges(int[] nums, int k) {
+        int count = 0;
+        int min = Integer.MAX_VALUE;
+        for (int i = 0; i < k; i++) {
+            Map<Integer, Integer> map = new HashMap<>();
+            int temp = i;
+            while (temp < nums.length - k) {
+                Integer orDefault = map.getOrDefault(nums[temp], 0);
+                orDefault++;
+                map.put(nums[temp], orDefault);
+                temp = temp + k;
+            }
+            Integer max = map.keySet().stream().max(((a, b) -> {
+                if (map.get(a) > map.get(b)) {
+                    return 1;
+                } else return -1;
+            })).get();
+            for (Integer integer : map.keySet()) {
+                if (max.equals(integer)) {
+                    min = Math.min(min, max);
+                } else {
+                    count += map.get(integer);
+                }
+            }
+        }
+        return count;
+    }
+
+    /**
+     * https://leetcode-cn.com/problems/hamming-distance/
+     *
+     * @param x
+     * @param y
+     * @return
+     */
+    public int hammingDistance(int x, int y) {
+        int i = x ^ y;
+        int count = 0;
+        while (i > 0) {
+            i &= (i - 1);
+            count++;
+        }
+        return count;
+    }
+
+
+    /**
+     * https://leetcode-cn.com/problems/minimum-moves-to-equal-array-elements-ii/
+     *
+     * @param nums
+     * @return
+     */
+    public int minMoves2(int[] nums) {
+        long min = Integer.MAX_VALUE;
+        long one = 0;
+        for (int i = 0; i < nums.length; i++) {
+            one = 0;
+            for (int j = 0; j < nums.length; j++) {
+                one = one + Math.abs(nums[i] - nums[j]);
+            }
+            min = Math.min(min, one);
+        }
+        return (int) min;
+    }
+
+    /**
+     * https://leetcode-cn.com/problems/total-hamming-distance/
+     *
+     * @param nums
+     * @return
+     */
+    public int totalHammingDistance(int[] nums) {
+        int count = 0;
+        for (int i = 0; i < nums.length; i++) {
+            for (int j = i; j < nums.length; j++) {
+                int i1 = nums[i] ^ nums[j];
+                while (i1 > 0) {
+                    i1 &= (i1 - 1);
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+
+
+    /**
+     * https://leetcode-cn.com/problems/integer-break/
+     *
+     * @param n
+     * @return
+     */
+    public int integerBreak(int n) {
+        int[] dp = new int[n + 1];
+        dp[0] = 0;
+        dp[1] = 0;
+        for (int i = 2; i <= n; i++) {
+            int max = 0;
+            for (int j = 1; j < i; j++) {
+                max = Math.max(max, Math.max((i - j) * j, dp[i - j] * j));
+            }
+            dp[i] = max;
+        }
+        return dp[n];
+    }
+
+    /**
+     * https://leetcode-cn.com/problems/reverse-string/
+     *
+     * @param s
+     */
+    public void reverseString(char[] s) {
+        int i1 = s.length - 1;
+        for (int i = 0; i < (s.length / 2); i++) {
+            char temp = s[i];
+            s[i] = s[i1 - i];
+            s[i1 - i] = temp;
+        }
+    }
+
+    /**
+     * https://leetcode-cn.com/problems/top-k-frequent-elements/
+     *
+     * @param nums
+     * @param k
+     * @return
+     */
+    public int[] topKFrequent(int[] nums, int k) {
+        Map<Integer, Integer> map = new HashMap<>();
+        for (int i = 0; i < nums.length; i++) {
+            map.put(nums[i], map.getOrDefault(nums[i], 0) + 1);
+        }
+        ArrayList<Map.Entry<Integer, Integer>> entries = new ArrayList<>(map.entrySet());
+        //已经拿到了个个数出现的频率，只需要进行排序就可以拿出钱个数据
+        Map.Entry<Integer, Integer>[] b = new Map.Entry[entries.size()];
+        for (int i = 0; i < entries.size(); i++) {
+            b[i] = entries.get(i);
+        }
+        querySort(b, 0, b.length - 1, k);
+        List<Map.Entry<Integer, Integer>> entries1 = Arrays.asList(b).subList(b.length - k, b.length);
+        List<Integer> collect = entries1.stream().map(Map.Entry::getKey).collect(Collectors.toList());
+        int[] re = new int[collect.size()];
+        for (int i = 0; i < collect.size(); i++) {
+            re[i] = collect.get(i);
+        }
+        return re;
+    }
+
+    public void querySort(Map.Entry<Integer, Integer>[] nums, int i, int j, int k) {
+        int l = i;
+        int r = j;
+        if (l >= r || nums.length - 1 - j > k) {
+            return;
+        }
+        int temp = nums[l].getValue();
+        Map.Entry<Integer, Integer> num = nums[l];
+        while (r > l) {
+            while (r > l && nums[r].getValue() >= temp) {
+                r--;
+            }
+            if (r > l) {
+                nums[l] = nums[r];
+                l++;
+            }
+            while (r > l && temp > nums[l].getValue()) {
+                l++;
+            }
+            if (r > l) {
+                nums[r] = nums[l];
+                r--;
+            }
+        }
+        nums[r] = num;
+        querySort(nums, i, r - 1, k);
+        querySort(nums, r + 1, j, k);
+    }
+
+    public boolean checkSubarraySum(int[] nums, int k) {
+        /*int[] temp = new int[nums.length];
+        temp[0] = nums[0];
+        for (int i = 1; i < nums.length; i++) {
+            temp[i] = temp[i - 1] + nums[i];
+            if (temp[i] % k == 0){
+                return true;
+            }
+        }
+
+        for (int i = 1; i < nums.length; i++) {
+            for (int j = nums.length - 1; j > i; j--) {
+                temp[j] = temp[j] - temp[i-1];
+                if (temp[j] % k == 0){
+                    return true;
+                }
+            }
+            temp[i] = nums[i];
+        }
+        return false;*/
+
+        Map<Integer, Integer> map = new HashMap<>();
+        map.put(0, -1);
+        int sum = 0;
+        for (int i = 0; i < nums.length; i++) {
+            sum = (sum + nums[i]) % k;
+            if (map.containsKey(sum)) {
+                Integer integer = map.get(sum);
+                if (i - integer > 1) {
+                    return true;
+                }
+            } else {
+                map.put(sum, i);
+            }
+        }
+        return false;
+    }
+
+    /**
+     * https://www.nowcoder.com/practice/75e878df47f24fdc9dc3e400ec6058ca?tpId=188&&tqId=38547&rp=1&ru=/activity/oj&qru=/ta/job-code-high-week/question-ranking
+     */
+    public ListNode ReverseList(ListNode head) {
+        if (head == null) {
+            return head;
+        }
+        ListNode next = head.next;
+        if (next == null) {
+            return head;
+        }
+        head.next = null;
+        while (next.next != null) {
+            ListNode temp = next.next;
+            next.next = head;
+            head = next;
+            next = temp;
+        }
+        next.next = head;
+        return next;
+    }
+
+    /**
+     * https://www.nowcoder.com/practice/e3769a5f49894d49b871c09cadd13a61?tpId=188&tqId=38547&rp=1&ru=%2Factivity%2Foj&qru=%2Fta%2Fjob-code-high-week%2Fquestion-ranking
+     *
+     * @param operators
+     * @param k
+     * @return
+     */
+    public int[] LRU(int[][] operators, int k) {
+        List<Integer> re = new ArrayList();
+        LinkedList<Integer> list = new LinkedList<>();
+        Map<Integer, Integer> map = new HashMap<>();
+        for (int i = 0; i < operators.length; i++) {
+            int[] operator = operators[i];
+            int i1 = operator[0];
+            if (i1 == 1) {
+                if (list.size() >= k) {
+                    Integer integer = list.removeFirst();
+                    map.remove(integer);
+                }
+                map.put(operator[1], operator[2]);
+                list.addLast(operator[1]);
+            } else if (i1 == 2) {
+                Integer integer = map.get(operator[1]);
+                if (integer == null) {
+                    re.add(-1);
+                } else {
+                    re.add(integer);
+                    list.remove(list.indexOf(operator[1]));
+                    list.addLast(operator[1]);
+                }
+            }
+        }
+        int[] ints = new int[re.size()];
+        for (int i = 0; i < re.size(); i++) {
+            ints[i] = re.get(i);
+        }
+        return ints;
+    }
+
+
+    /**
+     * nowcoder.com/practice/650474f313294468a4ded3ce0f7898b9?tpId=188&tqId=38547&rp=1&ru=%2Factivity%2Foj&qru=%2Fta%2Fjob-code-high-week%2Fquestion-ranking
+     *
+     * @param head
+     * @return
+     */
+    public boolean hasCycle(ListNode head) {
+        if (head == null) {
+            return false;
+        }
+        List<ListNode> list = new ArrayList<>();
+        list.add(head);
+        while (head.next != null) {
+            head = head.next;
+            if (list.contains(head)) {
+                return true;
+            }
+            list.add(head);
+        }
+        return false;
+    }
+
+
+    public int search1(int[] nums, int target) {
+        int left = 0;
+        int right = nums.length - 1;
+        int mid = 0;
+        Integer max = null;
+        while (left <= right) {
+            mid = left + ((right - left) / 2);
+            if (nums[mid] == target) {
+                while (mid > 0) {
+                    mid--;
+                    if (nums[mid] != target) {
+                        return mid + 1;
+                    }
+                }
+                return mid;
+            } else if (nums[mid] > target) {
+                right = mid - 1;
+            } else {
+                left = mid + 1;
+            }
+        }
+        return max == null ? -1 : max;
+    }
+
+    /**
+     * https://www.nowcoder.com/practice/04a5560e43e24e9db4595865dc9c63a3?tpId=188&tqId=38547&rp=1&ru=%2Factivity%2Foj&qru=%2Fta%2Fjob-code-high-week%2Fquestion-ranking
+     *
+     * @param root
+     * @return
+     */
+    public ArrayList<ArrayList<Integer>> levelOrder(TreeNode root) {
+        ArrayList<ArrayList<Integer>> arrayList = new ArrayList<>();
+        doLevelOrder(root, 0, arrayList);
+        return arrayList;
+    }
+
+    public void doLevelOrder(TreeNode treeNode, int leve, ArrayList<ArrayList<Integer>> arrayList) {
+        Integer integers = arrayList.size();
+        if (leve >= integers) {
+            ArrayList<Integer> list = new ArrayList<>();
+            list.add(treeNode.val);
+            arrayList.add(leve, list);
+        } else {
+            ArrayList<Integer> integers1 = arrayList.get(leve);
+            integers1.add(treeNode.val);
+            arrayList.set(leve, integers1);
+        }
+        if (treeNode.right != null) {
+            doLevelOrder(treeNode.right, leve + 1, arrayList);
+        }
+        if (treeNode.left != null) {
+            doLevelOrder(treeNode.left, leve + 1, arrayList);
+        }
+    }
+
+    /**
+     * https://www.nowcoder.com/practice/b56799ebfd684fb394bd315e89324fb4?tpId=188&tags=&title=&difficulty=0&judgeStatus=0&rp=1
+     *
+     * @param arr
+     * @return
+     */
+    public int maxLength(int[] arr) {
+        int j = 0;
+        Map<Integer, Integer> map = new HashMap<>();
+        int max = 0;
+        while (j < arr.length) {
+            if (map.keySet().contains(arr[j])) {
+                max = Math.max(max, map.keySet().size());
+                j = map.get(arr[j]) + 1;
+                map.clear();
+            } else {
+                map.put(arr[j], j);
+                j++;
+            }
+        }
+        max = Math.max(max, map.keySet().size());
+        return max;
+    }
+
+    /**
+     * https://www.nowcoder.com/practice/e0cc33a83afe4530bcec46eba3325116?tpId=188&tags=&title=&difficulty=0&judgeStatus=0&rp=1
+     *
+     * @param root
+     * @param o1
+     * @param o2
+     * @return
+     */
+    public int lowestCommonAncestor(TreeNode root, int o1, int o2) {
+        HashMap<Integer, List<Integer>> map = new HashMap<>();
+        doLowestCommonAncestor(root, o1, o2, new ArrayList<>(), map);
+        List<Integer> list = map.get(o1);
+        List<Integer> list1 = map.get(o2);
+
+        for (int i = 0; i < list.size() && i < list1.size(); i++) {
+            if (!list.get(i).equals(list1.get(i))) {
+                return list.get(i - 1);
+            }
+        }
+        return 0;
+    }
+
+    public void doLowestCommonAncestor(TreeNode root, int o1, int o2, List<Integer> list, Map<Integer, List<Integer>> map) {
+        if (root == null) {
+            return;
+        } else if (root.val == o1 || root.val == o2) {
+            list.add(root.val);
+            map.put(root.val, list);
+            return;
+        } else {
+            list.add(root.val);
+        }
+        doLowestCommonAncestor(root.right, o1, o2, new ArrayList<>(list), map);
+        doLowestCommonAncestor(root.left, o1, o2, new ArrayList<>(list), map);
+    }
+
+    /**
+     * https://www.nowcoder.com/practice/6a296eb82cf844ca8539b57c23e6e9bf?tpId=188&tags=&title=&difficulty=0&judgeStatus=0&rp=1
+     *
+     * @param input
+     * @param k
+     * @return
+     */
+    public ArrayList<Integer> GetLeastNumbers_Solution(int[] input, int k) {
+        if (k > input.length || input.length == 0) {
+            return new ArrayList<>();
+        }
+        Stack<Integer> stack1 = new Stack<>();
+        stack1.push(input[0]);
+        Stack<Integer> stack2 = new Stack<>();
+        for (int i = 1; i < input.length; i++) {
+            int size = stack1.size();
+            for (int j = 0; j < size; j++) {
+                Integer pop = stack1.pop();
+                if (pop > input[i]) {
+                    stack2.push(pop);
+                } else {
+                    stack1.push(pop);
+                    break;
+                }
+            }
+            if (stack1.size() < k) {
+                stack1.push(input[i]);
+            }
+            int size1 = stack2.size();
+            for (int j = 0; j < size1; j++) {
+                if (stack1.size() < k) {
+                    stack1.push(stack2.pop());
+                }
+            }
+            stack2.clear();
+        }
+        ArrayList<Integer> list = new ArrayList<>();
+        for (int i = 0; i < k; i++) {
+            list.add(stack1.pop());
+        }
+        Collections.reverse(list);
+        return list;
+    }
+
+    /**
+     * https://www.nowcoder.com/practice/89865d4375634fc484f3a24b7fe65665?tpId=188&tags=&title=&difficulty=0&judgeStatus=0&rp=1
+     *
+     * @param A
+     * @param m
+     * @param B
+     * @param n
+     */
+    public void merge(int A[], int m, int B[], int n) {
+        List<Integer> list = new ArrayList<>();
+        int i = 0, j = 0;
+        while (i < m && j < n) {
+            if (A[i] > B[j]) {
+                list.add(B[j]);
+                j++;
+            } else {
+                list.add(A[i]);
+                i++;
+            }
+        }
+        for (; i < m; i++) {
+            list.add(A[i]);
+        }
+        for (; j < n; j++) {
+            list.add(B[j]);
+        }
+        for (int k = 0; k < list.size(); k++) {
+            A[k] = list.get(k);
+        }
+    }
+
+    /**
+     * https://www.nowcoder.com/practice/a9fec6c46a684ad5a3abd4e365a9d362?tpId=188&tags=&title=&difficulty=0&judgeStatus=0&rp=1
+     *
+     * @param root
+     * @return
+     */
+    public int[][] threeOrders(TreeNode root) {
+        int[][] re = new int[3][];
+        List<Integer> list = new ArrayList<>();
+        lmr(root, list);
+        int[] lmr = new int[list.size()];
+        for (int i = 0; i < list.size(); i++) {
+            lmr[i] = list.get(i);
+        }
+        re[0] = lmr;
+        list.clear();
+
+        mlr(root, list);
+        lmr = new int[list.size()];
+        for (int i = 0; i < list.size(); i++) {
+            lmr[i] = list.get(i);
+        }
+        re[1] = lmr;
+        list.clear();
+
+
+        lrm(root, list);
+        lmr = new int[list.size()];
+        for (int i = 0; i < list.size(); i++) {
+            lmr[i] = list.get(i);
+        }
+        re[2] = lmr;
+        list.clear();
+        return re;
+    }
+
+    public void lmr(TreeNode root, List<Integer> list) {
+        if (root == null) {
+            return;
+        }
+        lmr(root.left, list);
+        list.add(root.val);
+        lmr(root.right, list);
+    }
+
+    public void mlr(TreeNode root, List<Integer> list) {
+        if (root == null) {
+            return;
+        }
+        list.add(root.val);
+        mlr(root.left, list);
+        mlr(root.right, list);
+    }
+
+    public void lrm(TreeNode root, List<Integer> list) {
+        if (root == null) {
+            return;
+        }
+        lrm(root.left, list);
+        lrm(root.right, list);
+        list.add(root.val);
+    }
+
+
+    /**
+     * https://leetcode-cn.com/leetbook/read/top-interview-questions-easy/x2zsx1/
+     *
+     * @param prices
+     * @return
+     */
+    public int maxProfit(int[] prices) {
+        int[][] dp = new int[prices.length][2];
+        //dp[i][0]  有  dp[i][1] 无
+        dp[0][0] = -prices[0];
+        dp[0][1] = 0;
+        for (int i = 1; i < prices.length; i++) {
+            dp[i][0] = Math.max(dp[i - 1][0], dp[i - 1][1] - prices[i]);
+            dp[i][1] = Math.max(dp[i - 1][0] + prices[i], dp[i - 1][1]);
+        }
+        return Math.max(dp[prices.length - 1][0], dp[prices.length - 1][1]);
+    }
+
+    /**
+     * @param nums
+     * @param k
+     */
+    public void rotate(int[] nums, int k) {
+        int[] newNums = new int[nums.length];
+        for (int j = 0; j < nums.length; j++) {
+            int x = j + k;
+            while (x > nums.length - 1) {
+                x -= nums.length;
+            }
+            newNums[x] = nums[j];
+        }
+        nums = newNums;
+    }
+
+    /**
+     * https://leetcode-cn.com/leetbook/read/top-interview-questions-easy/x248f5/
+     *
+     * @param nums
+     * @return
+     */
+    public boolean containsDuplicate(int[] nums) {
+        Arrays.sort(nums);
+        for (int i = 0; i < nums.length - 1; i++) {
+            if (nums[i] == nums[i + 1]) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * https://leetcode-cn.com/leetbook/read/top-interview-questions-easy/x21ib6/
+     *
+     * @param nums
+     * @return
+     */
+    public int singleNumber(int[] nums) {
+        Arrays.sort(nums);
+        int count = 0;
+        for (int i = 0; i < nums.length - 1; i++) {
+            if (nums[i] == nums[i + 1]) {
+                count = 0;
+            } else {
+                count++;
+            }
+            if (count == 2) {
+                return nums[i];
+            }
+        }
+        if (nums[nums.length - 2] != nums[nums.length - 1]) {
+            return nums[nums.length - 1];
+        }
+        return 0;
+    }
+
+
+    /**
+     * https://leetcode-cn.com/leetbook/read/top-interview-questions-easy/x2y0c2/
+     *
+     * @param nums1
+     * @param nums2
+     * @return
+     */
+    public int[] intersect(int[] nums1, int[] nums2) {
+        Arrays.sort(nums1);
+        Arrays.sort(nums2);
+        int n1 = 0;
+        int n2 = 0;
+        List<Integer> list = new ArrayList<>();
+        while (n1 < nums1.length && n2 < nums2.length) {
+            if (nums1[n1] == nums2[n2]) {
+                list.add(nums1[n1]);
+                n1++;
+                n2++;
+            } else {
+                if (nums1[n1] > nums2[n2]) {
+                    n2++;
+                } else {
+                    n1++;
+                }
+            }
+        }
+        int[] re = new int[list.size()];
+        for (int i = 0; i < list.size(); i++) {
+            re[i] = list.get(i);
+        }
+        return re;
+    }
+
+    /**
+     * https://leetcode-cn.com/leetbook/read/top-interview-questions-easy/x2cv1c/
+     *
+     * @param digits
+     * @return
+     */
+    public int[] plusOne(int[] digits) {
+        Stack<Integer> stack = new Stack<>();
+        Stack<Integer> stack1 = new Stack<>();
+        for (int digit : digits) {
+            stack.push(digit);
+        }
+        int sum = 1;
+        while (true) {
+            Integer pop = stack.pop();
+            int i = pop + sum;
+            if (i < 10) {
+                sum = 0;
+            }
+            stack1.push(i % 10);
+            if (stack.size() == 0) {
+                if (i >= 10) {
+                    stack1.push(1);
+                }
+                break;
+            }
+        }
+        int size = stack1.size();
+        int[] re = new int[size];
+        for (int i = 0; i < size; i++) {
+            re[i] = stack1.pop();
+        }
+        return re;
+    }
+
+    /**
+     * https://leetcode-cn.com/leetbook/read/top-interview-questions-easy/x2ba4i/
+     *
+     * @param nums
+     */
+    public void moveZeroes(int[] nums) {
+        for (int i = 0; i < nums.length; i++) {
+            if (nums[i] == 0) {
+                for (int j = i; j < nums.length; j++) {
+                    if (nums[j] != 0) {
+                        nums[i] = nums[j];
+                        nums[j] = 0;
+                        break;
+                    }
+                    if (j == nums.length - 1) {
+                        return;
+                    }
+                }
+            }
+        }
+    }
+
+//    /**
+//     *https://leetcode-cn.com/leetbook/read/top-interview-questions-easy/x2f9gg/
+//     * @param board
+//     * @return
+//     */
+//    public boolean isValidSudoku(char[][] board) {
+//        Map<Character,List<int[]>> map = new HashMap<>();
+//        for (int i = 0; i < board.length; i++) {
+//            for (int j = 0; j < board[i].length; j++) {
+//                List<int[]> orDefault = map.getOrDefault(board[i][j], new ArrayList<>());
+//                int[] ints = new int[2];
+//                ints[0] = i;
+//                ints[1] = j;
+//                orDefault.add(ints);
+//                map.put(board[i][j],orDefault);
+//            }
+//        }
+//
+//        Set<Character> characters = map.keySet();
+//        for (Character character : characters) {
+//            if (characters.equals('.')){
+//                continue;
+//            }
+//            List<int[]> list = map.get(character);
+//            for (int i = 0; i < list.size() - 1; i++) {
+//
+//            }
+//        }
+//    }
+
+
+    /**
+     * https://leetcode-cn.com/leetbook/read/top-interview-questions-easy/xnhhkv/
+     *
+     * @param matrix
+     */
+    public void rotate(int[][] matrix) {
+        int length = matrix.length;
+        //因为是对称的，只需要计算循环前半行即可
+        for (int i = 0; i < length / 2; i++)
+            for (int j = i; j < length - i - 1; j++) {
+                int temp = matrix[i][j];
+                int m = length - j - 1;
+                int n = length - i - 1;
+                matrix[i][j] = matrix[m][i];
+                matrix[m][i] = matrix[n][m];
+                matrix[n][m] = matrix[j][n];
+                matrix[j][n] = temp;
+            }
+
+    }
+
+    /**
+     * https://leetcode-cn.com/leetbook/read/top-interview-questions-easy/xnx13t/
+     *
+     * @param x
+     * @return
+     */
+
+    public int reverse(int x) {
+        long re = 0;
+        while (x != 0) {
+            re = re * 10 + x % 10;
+            x = x / 10;
+        }
+        return (int) re == re ? (int) re : 0;
+    }
+
+    /**
+     * https://leetcode-cn.com/leetbook/read/top-interview-questions-easy/xn5z8r/
+     *
+     * @param s
+     * @return
+     */
+    public int firstUniqChar(String s) {
+        Map<Character, Integer> map = new HashMap<>();
+        int min = Integer.MAX_VALUE;
+        for (char c : s.toCharArray()) {
+            map.put(c, map.getOrDefault(c, 0) + 1);
+        }
+        for (Character character : map.keySet()) {
+            if (map.get(character) == 1) {
+                min = Math.min(min, s.indexOf(character));
+            }
+        }
+        return min == Integer.MAX_VALUE ? -1 : min;
+    }
+
+    /**
+     * https://leetcode-cn.com/leetbook/read/top-interview-questions-easy/xn96us/
+     *
+     * @param s
+     * @param t
+     * @return
+     */
+    public boolean isAnagram(String s, String t) {
+        Map<Character, Integer> maps = new HashMap<>();
+
+        for (char c : s.toCharArray()) {
+            maps.put(c, maps.getOrDefault(c, 0) + 1);
+        }
+        for (char c : t.toCharArray()) {
+            if (!maps.containsKey(c)) {
+                return false;
+            }
+            maps.put(c, maps.getOrDefault(c, 0) - 1);
+        }
+
+        for (Character character : maps.keySet()) {
+            if (maps.get(character) != 0) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * https://leetcode-cn.com/leetbook/read/top-interview-questions-easy/xne8id/
+     *
+     * @param s
+     * @return
+     */
+    public boolean isPalindrome(String s) {
+        char[] chars = s.toCharArray();
+        int left = 0;
+        int right = chars.length - 1;
+        while (left < right) {
+            while (left < right && !Character.isLetterOrDigit(s.charAt(left)))
+                left++;
+            while (left < right && !Character.isLetterOrDigit(s.charAt(right)))
+                right--;
+            if (chars[left] == chars[right]) {
+                left++;
+                right++;
+            } else {
+                return false;
+            }
+        }
+        return false;
+    }
+
+
+    /**
+     * https://leetcode-cn.com/leetbook/read/top-interview-questions-easy/xnr003/
+     *
+     * @param haystack
+     * @param needle
+     * @return
+     */
+    public int strStr(String haystack, String needle) {
+        if (haystack.equals(needle)) {
+            return 0;
+        }
+        for (int i = 0; i < haystack.length() - needle.length() - 1; i++) {
+            if (haystack.startsWith(needle, i)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    /**
+     * https://leetcode-cn.com/leetbook/read/top-interview-questions-easy/xnpvdm/
+     *
+     * @param n
+     * @return
+     */
+    public String countAndSay(int n) {
+        if (n == 1) {
+            return "1";
+        }
+        if (n == 2) {
+            return "11";
+        }
+        String s = countAndSay(n - 1);
+        StringBuilder stringBuilder = new StringBuilder();
+        int x = 0;
+        int j = 0;
+        while (x < s.length()) {
+            while (j < s.length() && s.charAt(x) == s.charAt(j)) {
+                j++;
+            }
+            stringBuilder.append(j - x).append(s.charAt(x));
+            x = j;
+        }
+        return stringBuilder.toString();
+    }
+
+
+    /**
+     * https://leetcode-cn.com/leetbook/read/top-interview-questions-easy/xnmav1/
+     *
+     * @param strs
+     * @return
+     */
+    public String longestCommonPrefix(String[] strs) {
+        int min = Integer.MAX_VALUE;
+        String minStr = "";
+        for (String str : strs) {
+            if (str.length() < min) {
+                min = str.length();
+                minStr = str;
+            }
+        }
+
+        for (String str : strs) {
+            while (!str.startsWith(minStr)) {
+                minStr = minStr.substring(0, minStr.length() - 1);
+            }
+            if (minStr.length() == 0) {
+                return "";
+            }
+        }
+        return minStr;
+    }
+
+
+    /**
+     * https://leetcode-cn.com/leetbook/read/top-interview-questions-easy/xnarn7/
+     *
+     * @param node
+     */
+    public void deleteNode(ListNode node) {
+        node.val = node.next.val;
+        node.next = node.next.next;
+    }
+
+
+    /**
+     * https://leetcode-cn.com/leetbook/read/top-interview-questions-easy/xn2925/
+     *
+     * @param head
+     * @param n
+     * @return
+     */
+    public ListNode removeNthFromEnd(ListNode head, int n) {
+        int count = 1;
+        ListNode temp = head;
+        while (temp.next != null) {
+            temp = temp.next;
+            count++;
+        }
+        int i = count - n;
+        if (i == 0) {
+            return head.next;
+        }
+        temp = head;
+        for (int j = 0; j < i; j++) {
+            temp = temp.next;
+        }
+        temp.val = temp.next.val;
+        temp.next = temp.next.next;
+        return head;
+    }
+
+    /**
+     * https://leetcode-cn.com/leetbook/read/top-interview-questions-easy/xnnhm6/
+     *
+     * @param head
+     * @return
+     */
+    public ListNode reverseList1(ListNode head) {
+        /*if(head==null){
+            return null;
+        }
+        Stack<ListNode> stack = new Stack<>();
+        while (head != null) {
+            stack.push(head);
+            head = head.next;
+        }
+        head = stack.pop();
+        ListNode re = head;
+        while (stack.size() != 0) {
+            re.next = stack.pop();
+            re = re.next;
+        }
+        re.next = null;
+        return head;*/
+        if (head == null) {
+            return null;
+        }
+        ListNode re = head;
+        while (re.next != null) {
+            re = re.next;
+        }
+        ListNode listNode = doReverseList1(head);
+        listNode.next = null;
+        return re;
+    }
+
+    public ListNode doReverseList1(ListNode head) {
+        if (head.next == null) {
+            return head;
+        }
+        doReverseList1(head.next).next = head;
+        return head;
+    }
+
+
+    /**
+     * https://leetcode-cn.com/leetbook/read/top-interview-questions-easy/xnnbp2/
+     *
+     * @param l1
+     * @param l2
+     * @return
+     */
+    public ListNode mergeTwoLists(ListNode l1, ListNode l2) {
+        if (l1 == null) {
+            return l2;
+        }
+        if (l2 == null) {
+            return l1;
+        }
+        ListNode head = new ListNode(0);
+        ListNode nNode = head;
+        while (l1 != null && l2 != null) {
+            if (l1.val < l2.val) {
+                nNode.next = l1;
+                l1 = l1.next;
+            } else if (l1.val > l2.val) {
+                nNode.next = l2;
+                l2 = l2.next;
+            } else {
+                nNode.next = l1;
+                l1 = l1.next;
+                nNode = nNode.next;
+                nNode.next = l2;
+                l2 = l2.next;
+            }
+            nNode = nNode.next;
+        }
+
+        while (l1 != null) {
+            nNode.next = l1;
+            nNode = nNode.next;
+            l1 = l1.next;
+        }
+        while (l2 != null) {
+            nNode.next = l2;
+            nNode = nNode.next;
+            l2 = l2.next;
+        }
+        return head.next;
+    }
+
+    /**
+     * https://leetcode-cn.com/leetbook/read/top-interview-questions-easy/xnwzei/
+     *
+     * @param head
+     * @return
+     */
+    public boolean hasCycle1(ListNode head) {
+        ListNode listNode = head;
+        ListNode listNode1 = head.next;
+
+        while (listNode1 != null && listNode1.next != null && listNode1.next.next != null) {
+            if (listNode1 == listNode) {
+                return true;
+            }
+            listNode = listNode.next;
+            listNode1 = listNode1.next.next;
+        }
+        return false;
     }
 
     public static void main(String[] args) {
         Solution solution = new Solution();
-        int[] i = {1, 2, 5};
-        int[] obstacles = {2, 4, 4, 5};
-        System.out.println(solution.coinChange(i, 11));
+        int[][] ints = {{5, 1, 9, 11}, {2, 4, 8, 10}, {13, 3, 6, 7}, {15, 14, 12, 16}
+        };
+        TreeNode treeNode = new TreeNode(3);
+        TreeNode treeNode1 = new TreeNode(5);
+        TreeNode treeNode2 = new TreeNode(1);
+        treeNode.right = treeNode1;
+        treeNode.left = treeNode2;
+        String[] strs = {"flower", "flow", "flight"};
+        ListNode listNode = new ListNode(1);
+        ListNode listNode1 = new ListNode(2);
+        ListNode listNode2 = new ListNode(3);
+        ListNode listNode3 = new ListNode(4);
+        listNode.next = listNode1;
+        listNode1.next = listNode2;
+        listNode2.next = listNode3;
+        listNode3.next = listNode1;
+        ListNode listNode4 = new ListNode(1);
+        ListNode listNode5 = new ListNode(2);
+        ListNode listNode6 = new ListNode(3);
+        listNode4.next = listNode5;
+        listNode5.next = listNode6;
+        System.out.println(solution.hasCycle1(listNode));
     }
-
-
 }
+
+//public class Main {
+//    public static void main(String[] args) {
+//        Scanner scan = new Scanner(System.in);
+//        int num = scan.nextInt();
+//        int re = 0;
+//        int max = 9;
+//        int le = 1;
+//        if (num > 45) {
+//            System.out.println(-1
+//            );
+//        }
+//        while (num > 0) {
+//            if (num > le) {
+//                re += re + max * le;
+//                le *= 10;
+//            } else {
+//                re += re + max * num;
+//            }
+//            num -= max;
+//            max--;
+//        }
+//        System.out.println(re);
+//    }
+//}
+
+
+//public class Main {
+//    public static void main(String[] args) {
+//        Scanner scan = new Scanner(System.in);
+//        int num = scan.nextInt();
+//        scan = new Scanner(System.in);
+//        String s = scan.nextLine();
+//        scan = new Scanner(System.in);
+//        String s1 = scan.nextLine();
+//        int max = 0;
+//        List<Character> chars1 = s.chars()
+//                .mapToObj(i -> (char) i)
+//                .sorted(Character::compareTo)
+//                .collect(Collectors.toList());
+//        List<Character> chars = s1.chars()
+//                .mapToObj(i -> (char) i)
+//                .sorted(Character::compareTo)
+//                .collect(Collectors.toList());
+//        for (int i = 0; i < num; i++) {
+//            if (chars1.get(i) != chars.get(i)) {
+//                max += Math.abs(chars1.get(i) - chars.get(i));
+//            }
+//        }
+//        System.out.println(max);
+//    }
+//}
+
+
+//public class Main {
+//    public static void main(String[] args) {
+//        Scanner scan = new Scanner(System.in);
+//        int N = scan.nextInt(), M = scan.nextInt(), count = 0;
+//        int[] arr = new int[N];
+//        for(int i = 0 ; i < N ; i++){
+//            int num = scan.nextInt();
+//            if(num >= M)arr[i] = num % M;
+//            else arr[i] = M;
+//        }
+//        Map<Integer,Integer> list = new HashMap<>();
+//        int sum = 0;
+//        for (int i = 0; i < N; i++) {
+//            sum = (sum+arr[i])%M;
+//            if(list.containsKey(sum)){
+//                count += list.get(sum);
+//            }
+//            list.put(sum,list.getOrDefault(sum,0)+1);
+//        }
+//        System.out.println(count);
+//    }
+//}
+
+//public class Main {
+//    public static void main(String[] args) {
+//        Scanner scan = new Scanner(System.in);
+//        int N = scan.nextInt();
+//        int M = scan.nextInt();
+//        int[][] re = new int[N][M];
+//        for (int i = 0; i < N; i++) {
+//            for (int j = 0; j < M; j++) {
+//                int num = scan.nextInt();
+//                re[i][j] = num;
+//            }
+//        }
+//        int count = 0;
+//        for (int j = 0; j < N; j++) {
+//            for (int k = j + 1; k < N; k++) {
+//                int x = re[j][0] +re[k][0];
+//                boolean flag = true;
+//                for (int i = 1; i < M; i++) {
+//                     if (x != (re[j][i] +re[k][i])){
+//                         flag = false;
+//                         break;
+//                     }
+//                }
+//                if (flag){
+//                    count++;
+//                }
+//            }
+//        }
+//        System.out.println(count);
+//    }
+//
+//}
+
+//public class Main {
+//    public static void main(String[] args) {
+//        Scanner scan = new Scanner(System.in);
+//        int N = scan.nextInt();
+//        int[][] re = new int[N][3];
+//
+//        for (int i = 0; i < N; i++) {
+//            for (int j = 0; j < 3; j++) {
+//                re[i][j] = scan.nextInt();
+//            }
+//        }
+//
+//        for (int i = 0; i < N; i++) {
+//            int A = re[i][0];
+//            int B = re[i][1];
+//            int n = re[i][2];
+//            long h2 =A;
+//            long h1 =A * A - 2 * B;
+//            if (n == 2) {
+//                System.out.println(h1);
+//                continue;
+//            }
+//            for (int j = 3; j <= n; j++) {
+//                long temp = h1;
+//                h1 = A*h1 - B*h2;
+//                h2 = temp;
+//            }
+//            System.out.println(h1);
+//        }
+//    }
+//}
+
+//class Main {
+//    public static void main(String[] args) {
+//        Scanner scan = new Scanner(System.in);
+//        int N = scan.nextInt();
+//        String[] strings = new String[N + 1];
+//        for (int i = 0; i < N + 1; i++) {
+//            strings[i] = scan.nextLine();
+//        }
+//        for (int i = 1; i < N + 1; i++) {
+//            char[] chars = strings[i].toCharArray();
+//            boolean flag1 = false;
+//            boolean flag2 = false;
+//            List<Character> list = new ArrayList<>();
+//            list.add(chars[0]);
+//            for (int j = 1; j < chars.length; j++) {
+//                boolean tem = flag1;
+//                if (chars[j - 1] == chars[j]) {
+//                    if (tem || (flag2 && j > 2)) {
+//                        continue;
+//                    }
+//                    flag1 = true;
+//                } else {
+//                    flag1 = false;
+//                }
+//                list.add(chars[j]);
+//
+//                flag2 = tem;
+//            }
+//            char[] re = new char[list.size()];
+//            for (int j = 0; j < list.size(); j++) {
+//                re[j] = list.get(j);
+//            }
+//            System.out.println(String.valueOf(re));
+//        }
+//    }
+//}
+
+
+//class Main {
+//    public static void main(String[] args) {
+//        Scanner scan = new Scanner(System.in);
+//        int N = scan.nextInt(), M = scan.nextInt();
+//        int[] nums = new int[N];
+//        for (int i = 0; i < N; i++) {
+//            nums[i] = scan.nextInt();
+//        }
+//
+//        int[] cha = new int[N - 1];
+//        for (int i = 0; i < N - 1; i++) {
+//            cha[i] = nums[i + 1] - nums[i];
+//        }
+//        Set<String> strings = new HashSet<>();
+//        for (int i = 0; i < cha.length; i++) {
+//            int[] qian = new int[cha.length];
+//            qian[i] = cha[i];
+//            for (int j = 1; j < cha.length; j++) {
+//                if (i == j) {
+//                    continue;
+//                }
+//                qian[j] = cha[j] + qian[j - 1];
+//                if (qian[j] <= M) {
+//                    strings.add(Math.max(i, j) + "," + Math.min(i, j));
+//                }
+//            }
+//        }
+//        System.out.println(strings.size());
+//    }
+//}
