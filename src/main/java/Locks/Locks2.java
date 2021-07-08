@@ -1,6 +1,8 @@
 package Locks;
 
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.LockSupport;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -11,7 +13,6 @@ import java.util.concurrent.locks.ReentrantLock;
  * @create: 2020-11-06 15:58:15
  **/
 public class Locks2 {
-
     int a = 0;
     Lock lock1 = new ReentrantLock();
     public static void main(String[] args) {
@@ -31,6 +32,7 @@ public class Locks2 {
             }
         }).start();
         locks.syncAdd();
+
     }
 
     public void add() throws InterruptedException {
@@ -65,4 +67,7 @@ public class Locks2 {
     public synchronized void syncDel(){
         System.out.println("再次获取sync锁");
     }
+
+
+
 }
