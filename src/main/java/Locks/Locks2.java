@@ -1,5 +1,7 @@
 package Locks;
 
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.LockSupport;
@@ -17,22 +19,30 @@ public class Locks2 {
     Lock lock1 = new ReentrantLock();
     public static void main(String[] args) {
         Locks2 locks = new Locks2();
-        new Thread(()->{
-            try {
-                locks.del();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }).start();
-        new Thread(()->{
-            try {
-                locks.add();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }).start();
-        locks.syncAdd();
-
+//        new Thread(()->{
+//            try {
+//                locks.del();
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//        }).start();
+//        new Thread(()->{
+//            try {
+//                locks.add();
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//        }).start();
+//        locks.syncAdd();
+        for (int i = 0; i < 10; i++) {
+            new Thread(()->{
+                try {
+                    locks.del();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }).start();
+        }
     }
 
     public void add() throws InterruptedException {
@@ -67,7 +77,6 @@ public class Locks2 {
     public synchronized void syncDel(){
         System.out.println("再次获取sync锁");
     }
-
 
 
 }

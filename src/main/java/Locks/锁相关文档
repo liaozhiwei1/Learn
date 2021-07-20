@@ -4,8 +4,8 @@
 线程协作： 见图
     sleep(): 不会释放锁。
     wait(): 释放锁进入阻塞。
-    notify(): 唤醒随机一个线程。
-    notifyAll(): 唤醒所有线程。
+    notify(): 唤醒随机一个线程。不释放锁
+    notifyAll(): 唤醒所有线程。不释放锁
     使用wait()和notifyAll()实现简单的池资源： src/main/java/Thread/pool/MyThreadPool.java
 
 关键字:
@@ -13,7 +13,7 @@
         对象锁。（无论是普通对象还是class对象）
         加锁之后自动解锁，可由编译后的class文件看出。
         重量级锁，需要操作系统调度。
-    volatile:
+    volatile:  （保证基本数据类型，对象引用无法保证）
         禁止指令重排序
         保证可见性
         不保证原子性(无法实现线程同步)

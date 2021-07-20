@@ -20,7 +20,7 @@ import java.util.concurrent.*;
  * @author: zhiwei.liao
  * @create: 2020-11-17 11:25:29
  **/
-public class Threadpool {
+public class ThreadPool {
 
     public static void main(String[] args) {
         ExecutorService threadPoolExecutor = new ThreadPoolExecutor(2, 3, 1, TimeUnit.SECONDS, new LinkedBlockingQueue<>(2), new MyHeader());
@@ -59,6 +59,7 @@ public class Threadpool {
 class MyHeader implements RejectedExecutionHandler {
     @Override
     public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
+
         System.out.println("进入处理");
 //        executor.execute(r);
     }
