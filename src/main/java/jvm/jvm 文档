@@ -5,6 +5,59 @@
 
 
 3.内存分配：见图
-    栈上分配：1.逃逸分析：一个变量是否跨方法
+    栈上分配：1.逃逸分析：一个变量是否跨方法（外部线程是否可见）
              2.标量替换：一个变量全部由基本数据类型组成，可以拆分为所有的基本数据类型
-    TLAB:在堆上，每个线程有一小块线程独立的内存空间
+    TLAB:在堆上，每个线程有一小块线程独立的内存空间，这样使得内存分配不需要加锁
+
+4.如何定位垃圾：引用计数算法、根可达算法
+
+5.垃圾清除算法：标记清除算法(位置不连续且两遍扫描，效率低)、复制算法(没有碎片，但是存在内存浪费)、标记压缩(没有碎片,两遍扫描效率低)
+
+6.垃圾收集器: 年轻代： serial     parallelScavenge   parNew    G1(使用逻辑分区，不在存在真正的物理分区)
+            老年代:  SerialOld     parallelOld       CMS      G1
+
+            serial 用于年轻代 串行回收
+            parallelScavenge  用于年轻代 并行回收
+            parNew  用于年轻代 并行回收
+            CMS 并行回收，应用线程和回收线程同时工作。以降低stw的时间
+
+7.调优：
+    1.jvm规划和预调优
+        1: 熟悉业务场景。 响应时间优先（CMS、G1、ZGC）、吞吐量优先（parallelScavenge+parallelOld）
+        2：选择回收期组合
+        3：计算内存需求
+        4：选定cpu
+        5：设定年代大小以及升级年代的条件
+        6：设置日志参数      -Xloggc:/opt/xxx/logs/xxx-xxx-gc-%t.log -XX:+UseGCLogFileRotation -XX:NumberOfGCLogFiles=5 -XX:GCLogfileSize=20M -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+PrintGCCause
+        7：观察日志
+    2. 优化环境
+        1.系统cpu经常100% 如何调优?
+            定位线程(top) --> 导出堆栈(jstack) --> 定位方法(栈帧)
+        2.内存飙高，如何排查问题?
+            导出堆内存(jmap) --> 分析(jhat mat jvisualvm)
+    3.解决oom
+        jmap -dump:format=b,file=<pid>  堆转储存命令对程序 影响很大，不建议使用除非已经隔离服务器 jmap -histo <pid> 查看命令  -XX:+HeapDumpOnOutOfMemoryError 产生oom自动堆转储
+        jstack <pid>
+        jhat 对hprof文件进行分析
+    4.使用arthas进行项目监控
+        https://arthas.aliyun.com/doc/commands.html
+
+8.案例
+    1.
+        现象：程序响应缓慢
+        操作：查看gc日志，发现Fgc十分频繁  怀疑是内存过小导致gc频繁，当时的内存是2G
+        现象：增加内存至4g，后系统响应变快，但是存在卡顿现象。
+        操作：查看gc日志，发现Fgc时间长  怀疑是因为增加内存后，虽然减少了Fgc的次数，但是每次Fgc需要清理的内存变大，导致stw时间变长。
+                查看当时的GC收集器，发现使用的是ps+po的收集器，这种串行收集器会暂停用户线程，执行GC线程
+                尝试改用G1收集器，这种收集器摒弃原有收集器的物理分区，直接将内存分为多个小块，用满就收集。这样就不会暂停用户线程
+
+        最后，系统正常运行。目前没有观察到异常
+    2.
+        现象：应用程序经常出现oom。
+        操作：使用jhat命令 对hprof文件进行分析，发现有存在多个Http11OutputBuffer对象并且每个Http11OutputBuffer对象都占用了大量的
+                字节，经过跟踪发现Http11OutputBuffer属于tomcat的请求输出缓冲区，最终查到了再配置文件中不知道哪位同事给max-header-size设置了
+                一个很大的值。
+
+
+
+
