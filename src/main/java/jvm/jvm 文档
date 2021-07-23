@@ -16,10 +16,10 @@
 6.垃圾收集器: 年轻代： serial     parallelScavenge   parNew    G1(使用逻辑分区，不在存在真正的物理分区)
             老年代:  SerialOld     parallelOld       CMS      G1
 
-            serial 用于年轻代 串行回收
-            parallelScavenge  用于年轻代 并行回收
+            serial 用于年轻代 串行回收  工作线程 --> 回收线程（单线程）
+            parallelScavenge  用于年轻代 并行回收 工作线程 --> 回收线程（多线程）
             parNew  用于年轻代 并行回收
-            CMS 并行回收，应用线程和回收线程同时工作。以降低stw的时间
+            CMS 并行回收，应用线程和回收线程同时工作。以降低stw的时间  工作线程和回收线程同时进行
 
 7.调优：
     1.jvm规划和预调优

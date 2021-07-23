@@ -51,10 +51,12 @@ public class Thread{
 //            System.out.println("1111");
 //        }
 //        System.out.println(futureTask.get());
-
+        ThreadLocal threadLocal = new InheritableThreadLocal();
+        threadLocal.set(new Object());
         MyThreadPool myThreadPool = new MyThreadPool(20);
         for (int i = 0; i < 50; i++) {
             new java.lang.Thread(()->{
+                Object o = threadLocal.get();
                 try {
                     Game thread = myThreadPool.getThread(1000);
                     if (thread!=null){

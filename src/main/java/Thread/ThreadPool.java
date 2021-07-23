@@ -23,12 +23,14 @@ import java.util.concurrent.*;
 public class ThreadPool {
 
     public static void main(String[] args) {
+
         ExecutorService threadPoolExecutor = new ThreadPoolExecutor(2, 3, 1, TimeUnit.SECONDS, new LinkedBlockingQueue<>(2), new MyHeader());
         try {
             for (int i = 0; i < 10; i++) {
                 threadPoolExecutor.execute(() -> {
                     try {
-                        System.out.println(java.lang.Thread.currentThread().getName() + "");
+                        System.out.println(java.lang.Thread.currentThread().getName());
+
 //                        java.lang.Thread.sleep(1000);
                     } catch (Exception e) {
                         e.printStackTrace();
