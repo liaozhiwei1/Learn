@@ -94,7 +94,7 @@ class Resource1{
     }
 }
 
-class queue1 {
+class  queue1 {
     public static void main(String[] args) {
         //3.0
         Resource resource = new Resource(new SynchronousQueue<>());

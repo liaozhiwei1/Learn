@@ -1,9 +1,5 @@
 package LeetCode;
 
-import org.springframework.util.ObjectUtils;
-
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -2715,3 +2711,45 @@ public class Solution {
 //        System.out.println(strings.size());
 //    }
 //}
+/*
+class Main {
+    public static void main(String[] args) throws Exception {
+        Scanner scanner = new Scanner(System.in);
+        while (scanner.hasNext()) {
+            StringBuilder s = new StringBuilder(scanner.nextLine());
+            doWork(s);
+        }
+    }
+
+
+    public static void doWork(StringBuilder s){
+        if (s.toString().equals("")) {
+            return;
+        } else if (s.length() < 8) {
+            int length = s.length();
+            for (int i = 0; i <= 8 - length; i++) {
+                s.append("0");
+            }
+            System.out.println(s.toString());
+        }else if(s.length() == 8){
+            System.out.println(s.toString());
+        }else {
+            String substring = s.substring(0, 8);
+            doWork(new StringBuilder(substring));
+            String substring1 = s.substring(8);
+            doWork(new StringBuilder(substring1));
+        }
+    }
+}
+*/
+class Main {
+    public static void main(String[] args) throws Exception {
+        Scanner scanner = new Scanner(System.in);
+        int pn = scanner.nextInt();
+        String s = scanner.nextLine();
+        int le = scanner.nextInt();
+
+        String[] s1 = s.split(" ");
+
+    }
+}

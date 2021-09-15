@@ -12,10 +12,10 @@ import org.springframework.stereotype.Service;
  **/
 @Service
 public class ServiceA {
-//    @Autowired
-//    public ServiceB serviceB;
-
     @Autowired
+    public ServiceB serviceB;
+//
+//    @Autowired
     public testMapper testMapper;
 
     public ServiceA() {

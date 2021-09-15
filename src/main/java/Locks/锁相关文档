@@ -4,8 +4,8 @@
 线程协作： 见图
     sleep(): 不会释放锁。
     wait(): 释放锁进入阻塞。
-    notify(): 唤醒随机一个线程。不释放锁
-    notifyAll(): 唤醒所有线程。不释放锁
+    notify(): 唤醒随机一个线程。
+    notifyAll(): 唤醒所有线程。
     使用wait()和notifyAll()实现简单的池资源： src/main/java/Thread/pool/MyThreadPool.java
 
 关键字:

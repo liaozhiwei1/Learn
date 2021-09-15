@@ -1,9 +1,10 @@
 package Locks;
 
+import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
- * @version: 1.0
+ * @version: 1.0fe
  * @description: 自旋锁:旋转等待获取锁。
  *                      优点:没有线程的切换,速度快;
  *                      缺点:旋转等待的过程消耗cpu资源,当等待线程过多会过度消耗CPU资源;

@@ -1,0 +1,26 @@
+1.重点接口：
+    BeanFactory:
+    FactoryBean:
+        BeanFactory和FactoryBean区别：首先两者都是用于创建对象，使用BeanFactory的时候必须遵循完整的创建过程，这个过程由spring控制
+                                                            使用FactoryBean只需要调用getObject()就可以返回具体对象，整个创建过程由用户自己控制，比较灵活。
+    Aware: 添加各种系统属性
+    BeanDefinition:
+    BeanDefinitionReader:
+    BeanFactoryPostProcessor: 对BeanDefinition进行各种前置操作接口
+    BeanPoserProcessor: 在bean的init方法前置以及后置做处理，aop的关键入口
+    Environment:
+
+2.三级缓存
+            /** Cache of singleton objects: bean name to bean instance. */
+            一级缓存
+        	private final Map<String, Object> singletonObjects = new ConcurrentHashMap<>(256);
+
+        	/** Cache of singleton factories: bean name to ObjectFactory. */
+        	三级缓存
+        	private final Map<String, ObjectFactory<?>> singletonFactories = new HashMap<>(16);
+
+        	/** Cache of early singleton objects: bean name to bean instance. */
+        	二级缓存
+        	private final Map<String, Object> earlySingletonObjects = new ConcurrentHashMap<>(16);
+
+
