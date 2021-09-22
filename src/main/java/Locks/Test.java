@@ -1,7 +1,6 @@
 package Locks;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.locks.LockSupport;
 
 /**
@@ -17,8 +16,11 @@ import java.util.concurrent.locks.LockSupport;
  * 注意：本内容仅限于上海宝尊电商内部传阅，禁止外泄以及用于其他的商业目的
  */
 public class Test {
+    TreeMap treeMap = new TreeMap();
 
-    public static void main(String[] args) {
+    public synchronized static void main(String[] args) {
+
+
 //        Demo demo = new Demo();
 //        Thread thread1 = new Thread(() -> {
 //            while (demo.size() != 5){
@@ -40,7 +42,6 @@ public class Test {
 //                }
 //            }
 //        }).start();
-
         Demo demo = new Demo();
         Object lock = new Object();
         new Thread(() -> {
@@ -53,8 +54,15 @@ public class Test {
                         e.printStackTrace();
                     }
                 }
+                LinkedList list = new LinkedList( );
+                for (int i = 0; i < list.size(); i++) {
+
+                }
                 lock.notifyAll();
             }
+            Stack stack = new Stack();
+            List<Node> list = new ArrayList();
+            Collections.sort(list, Comparator.comparingInt((Node a) -> a.anInt));
             System.out.println("t2 结束");
         }).start();
         new Thread(() -> {
@@ -79,7 +87,7 @@ public class Test {
 
 class Demo {
     public List<Object> size = new ArrayList<>();
-
+    TreeMap treeMap = new TreeMap();
     public void add() {
         System.out.println(size.size());
         size.add(new Object());
@@ -88,4 +96,10 @@ class Demo {
     public int size() {
         return size.size();
     }
+}
+
+class Node{
+    public int anInt;
+    public int b;
+
 }
