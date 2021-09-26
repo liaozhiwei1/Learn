@@ -14,6 +14,7 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.util.ObjectUtils;
 
 @SpringBootApplication
+@MapperScan
 public class SpringLeanApplication implements ApplicationContextAware {
 
     private static ApplicationContext applicationContext;

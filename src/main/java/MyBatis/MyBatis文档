@@ -1,0 +1,22 @@
+1.sqlSessionFactoryBuilder: 构建sqlSessionFactory的构建器，用于读取配置文件构建sqlSessionFactory，方法级别的生命周期
+  sqlSessionFactory: sqlSession的建造工厂，用于回去sqlSession，程序基本的生命周期
+  sqlSession: 一次数据库连接。
+  sqlMapper: 调用的显示接口。
+
+  #{}: 预编译，传入的字符串会加上带引号，可以很有效的预防sql注入
+  ${}: 传值，采用字符串直接替换，容易造成sql注入。
+2.动态sql语句:
+    if标签  做逻辑判断
+    trim，where，set标签
+    forEach标签 循环
+        通过mybatis进行批量操作？ 使用forEach 批量动态生成sql语句，使用Batch 执行器(excutor) 批量提交
+
+3.缓存
+    一级缓存: sqlSession级别，会将查询方法和参数 计算出key，将查询结果和计算出来的key放到Map中作为缓存，在同一个sqlSessions中相同的方法和参数的查询会直接走缓存。但是增删改查操作会删除一级缓存
+    二级缓存: 可以实现跨sqlSession共享缓存，缓存单位是nameSpace。 容易出现脏读现象  namespaceA在对数据进行操作以后会删除掉namespaceA所对应的二级缓存，但是不会删除其他的namespace对应的二级缓存，导致脏读
+
+4.mybatis中使用的设计模式:
+    外观模式: 客户端只需要面向sqlSession进行编程。
+    适配器模式(将两个不兼容的接口，连接起来。将一个接口转化为客户希望的内一个接口)： mybatis 日志组件采用的是引入第三方的日志组件，提供一个统一的日志接口，然后给不同的第三方日志组件加一个适配器。用于统一使用。
+    代理模式(给目标一个代理对象，由代理对象控制目标对象的引用，可以对原有业务进行增强，也可以防止直接访问带来的复杂性):日志组件将通过动态代理织入原始业务。
+    工厂模式( 提供一种创建对象的最佳方式，定义一个创建对象的接口，让其子类决定实例化哪一个工厂类，将创建过程延迟到了子类):  mybatis中创建不同的数据源，使用的就是工厂模式。

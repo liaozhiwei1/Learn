@@ -1,9 +1,12 @@
 package MyBatis;
 
 
+import org.apache.ibatis.executor.SimpleExecutor;
 import org.apache.ibatis.session.Configuration;
+import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
+import org.apache.ibatis.transaction.Transaction;
 import org.json.JSONObject;
 
 import java.io.FileReader;
@@ -27,12 +30,11 @@ public class Mybatis {
         FileReader reader = new FileReader("D:\\ross最新\\Learn\\src\\main\\resources\\mybatis.xml");
         SqlSessionFactoryBuilder sqlSessionFactoryBuilder = new SqlSessionFactoryBuilder();
         SqlSessionFactory build = sqlSessionFactoryBuilder.build(reader);
+        SqlSession sqlSession = build.openSession();
         Configuration configuration = build.getConfiguration();
         configuration.addMapper(testMapper.class);
         testMapper mapper = build.openSession().getMapper(testMapper.class);
-
-        JSONObject jsonObject = mapper.find(1318750478217375744l);
-        Map map  = new HashMap();
+        sqlSession.close();
     }
 
     public void doQuery(){
