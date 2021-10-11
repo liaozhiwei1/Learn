@@ -27,13 +27,14 @@ import java.util.Map;
 public class Mybatis {
 
     public static void main(String[] args) throws Exception {
-        FileReader reader = new FileReader("D:\\ross最新\\Learn\\src\\main\\resources\\mybatis.xml");
+        FileReader reader = new FileReader("/Users/liaozhiwei/Documents/learn/Learn/src/main/resources/mybatis.xml");
         SqlSessionFactoryBuilder sqlSessionFactoryBuilder = new SqlSessionFactoryBuilder();
         SqlSessionFactory build = sqlSessionFactoryBuilder.build(reader);
         SqlSession sqlSession = build.openSession();
         Configuration configuration = build.getConfiguration();
         configuration.addMapper(testMapper.class);
         testMapper mapper = build.openSession().getMapper(testMapper.class);
+        mapper.find(111L);
         sqlSession.close();
     }
 
