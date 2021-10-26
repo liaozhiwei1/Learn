@@ -58,6 +58,63 @@
                 字节，经过跟踪发现Http11OutputBuffer属于tomcat的请求输出缓冲区，最终查到了再配置文件中不知道哪位同事给max-header-size设置了
                 一个很大的值。
 
+G1垃圾回收器：
+        1。放弃原有的年轻代，老年代的物理分区，将整个堆内存分为多个内存小块。小块也会被标记为年轻代，survivor，老年代等分区。
+        2.采用复制-整理算法和复制算法
+
+        年轻代回收（youngGC）STW （通过控制年轻代的）:
+            1.扫描根：扫描GCROOT，根寻址算法找出存活对象，并标记
+            2.根据dirty card queue 中的card更新Rset(Rset能够准确的对象引用关系)
+            3.处理Rset   被老年代对象指向的对象也是存活对象
+            4.使用引用复制算法进行回收
+
+         并发标记（当堆空间占用达到阈值，默认为45%）:
+            1.初始化标志  stw：扫描GCRoot直接可达对象
+            2.根区域扫描：扫描幸存者区到老年代的引用,必须要youngGC之前完成，因为youngGc会改变幸存者区
+            3.并发标记过程：在整个堆中进行并发标记，遇到整个内存块都是垃圾对象的情况会直接回收，其他的则是记录存活率，可能会被youngGC打断
+            4.再次标记：补充之前并发标记过程中产生的垃圾对象
+            5.独占清理 stw：此阶段并不会真的清理垃圾，而是更具回收价值进行排序
+            6.并发清理:
 
 
 
+
+
+
+一次G1垃圾回收的全过程
+0.162: [GC pause (G1 Evacuation Pause) (young), 0.0210038 secs]
+   [Parallel Time: 20.3 ms, GC Workers: 10]
+      //开始GC
+      [GC Worker Start (ms): Min: 162.1, Avg: 162.2, Max: 162.2, Diff: 0.1]
+      //扫描Roots
+      [Ext Root Scanning (ms): Min: 0.1, Avg: 0.1, Max: 0.4, Diff: 0.3, Sum: 1.3]
+      //更新Rset（Remembered set）
+      //根据dirty card queue 中的card更新Rset 引用赋值的时候需要向dirty card queue队列入队一个保存了对象信息的crad。所以Rset可以准确的反应对象引用关系
+      [Update RS (ms): Min: 0.0, Avg: 0.0, Max: 0.0, Diff: 0.0, Sum: 0.0]
+         [Processed Buffers: Min: 0, Avg: 0.0, Max: 0, Diff: 0, Sum: 0]
+       //扫描Rset对应的分区  避免扫描老年代，但是在这个阶段由于Rs已经更新完成，所以如果还出现其他垃圾的话就只能下次再回收，这些垃圾称为浮动垃圾
+      [Scan RS (ms): Min: 0.0, Avg: 0.0, Max: 0.1, Diff: 0.1, Sum: 0.3]
+      //扫描code root   code root是指在JIT进行优化以后缓存起来的代码所引用的对象
+      [Code Root Scanning (ms): Min: 0.0, Avg: 0.0, Max: 0.0, Diff: 0.0, Sum: 0.1]
+      //复制算法进行垃圾回收
+      [Object Copy (ms): Min: 19.8, Avg: 20.0, Max: 20.0, Diff: 0.2, Sum: 199.6]
+      [Termination (ms): Min: 0.0, Avg: 0.0, Max: 0.0, Diff: 0.0, Sum: 0.0]
+         [Termination Attempts: Min: 1, Avg: 1.0, Max: 1, Diff: 0, Sum: 10]
+      [GC Worker Other (ms): Min: 0.0, Avg: 0.0, Max: 0.0, Diff: 0.0, Sum: 0.1]
+      [GC Worker Total (ms): Min: 20.1, Avg: 20.1, Max: 20.2, Diff: 0.1, Sum: 201.5]
+      [GC Worker End (ms): Min: 182.3, Avg: 182.3, Max: 182.3, Diff: 0.0]
+    //将code root修正到正确的内存区间
+   [Code Root Fixup: 0.0 ms]
+   //清除修正之前的分区内存
+   [Code Root Purge: 0.0 ms]
+   //清除Rset
+   [Clear CT: 0.1 ms]
+   [Other: 0.6 ms]
+      [Choose CSet: 0.0 ms]
+      [Ref Proc: 0.5 ms]
+      [Ref Enq: 0.0 ms]
+      [Redirty Cards: 0.1 ms]
+      [Humongous Register: 0.0 ms]
+      [Humongous Reclaim: 0.0 ms]
+      [Free CSet: 0.0 ms]
+   [Eden: 24.0M(24.0M)->0.0B(12.0M) Survivors: 0.0B->3072.0K Heap: 24.0M(50.0M)->20.9M(50.0M)]

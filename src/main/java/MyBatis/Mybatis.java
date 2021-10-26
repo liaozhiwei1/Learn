@@ -31,9 +31,7 @@ public class Mybatis {
         SqlSessionFactoryBuilder sqlSessionFactoryBuilder = new SqlSessionFactoryBuilder();
         SqlSessionFactory build = sqlSessionFactoryBuilder.build(reader);
         SqlSession sqlSession = build.openSession();
-        Configuration configuration = build.getConfiguration();
-        configuration.addMapper(testMapper.class);
-        testMapper mapper = build.openSession().getMapper(testMapper.class);
+        testMapper mapper = sqlSession.getMapper(testMapper.class);
         mapper.find(111L);
         sqlSession.close();
     }

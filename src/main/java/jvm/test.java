@@ -1,5 +1,6 @@
 package jvm;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
@@ -21,12 +22,12 @@ public class test {
     private Lock lock =new ReentrantLock();
     private Lock lock1 = new ReentrantLock();
     public static  void  main(String[] args) throws InterruptedException {
-        List list = new LinkedList();
-        for (; ; ) {
-            byte[] bytes = new byte[1024];
-            Thread.sleep(200);
-            list.add(bytes);
-        }
+//        List list = new LinkedList();
+//        for (; ; ) {
+//            byte[] bytes = new byte[1024];
+//            Thread.sleep(200);
+//            list.add(bytes);
+//        }
 //        test test = new test();
 //        new Thread(()->{
 //            try {
@@ -42,9 +43,15 @@ public class test {
 //                e.printStackTrace();
 //            }
 //        }).start();
+
+        List<byte[]> list = new ArrayList<>();
+        for (int i = 0; i < 1000000; i++) {
+            byte[] objects = new  byte[1024];
+            list.add(objects);
+        }
     }
 
-    public void t() throws InterruptedException {
+/*    public void t() throws InterruptedException {
         lock.lock();
         while (true){
 
@@ -53,5 +60,5 @@ public class test {
 
     public void t1() throws InterruptedException {
         lock.lock();
-    }
+    }*/
 }

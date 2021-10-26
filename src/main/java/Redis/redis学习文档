@@ -1,3 +1,4 @@
+reids高性能的原因：1.内存操作，2.单线程操作，3.epoll 多路复用
 redis 5种数据结构：
     String : key - String
         redis 分布式锁

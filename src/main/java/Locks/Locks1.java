@@ -2,6 +2,7 @@ package Locks;
 
 import sun.misc.Unsafe;
 
+import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.LongAdder;
 import java.util.concurrent.locks.Lock;
@@ -23,15 +24,59 @@ import java.util.concurrent.locks.ReentrantLock;
  * @create: 2020-11-05 15:16:07
  **/
 public class Locks1 {
-
-    int a = 0;
     Lock reentrantLock = new ReentrantLock(); //默认创建非公平锁
     Lock reentrantLock1 = new ReentrantLock(true); //创建公平锁
+    private volatile static int i = 0;
+
     public static void main(String[] args) {
-        Locks1 locks1 = new Locks1();
-        locks1.test1();
-        LongAdder longAdder = new LongAdder();
+  /*      Object o = new Object();
+        new Thread(() -> {
+            synchronized (o) {
+                while (i < 100) {
+                    i++;
+                    System.out.println(i + Thread.currentThread().getName());
+                    o.notifyAll();
+                    try {
+                        o.wait();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }).start();
+        new Thread(() -> {
+            synchronized (o) {
+                while (i < 100) {
+                    i++;
+                    System.out.println(i+ Thread.currentThread().getName());
+                    o.notifyAll();
+                    try {
+                        o.wait();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }).start();*/
+
+        double max = 100.00;
+        for (int j = 0; j < 2; j++) {
+            double re = a(0,max);
+            System.out.println(re);
+            max = max -re;
+        }
+        System.out.println((double) Math.round(max*100)/100);
     }
+
+    public static double a(double min,double max){
+        Random random = new Random();
+        double re = min+(random.nextDouble())*(max-min);
+        return (double) Math.round(re*100)/100;
+    }
+
+
+
+/*
 
     public void test1() {
         for (int i = 0; i < 10000; i++) {
@@ -67,4 +112,6 @@ public class Locks1 {
         }
         System.out.println(this.a);
     }
+}
+*/
 }
