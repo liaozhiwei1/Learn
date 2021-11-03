@@ -1,9 +1,5 @@
 package IO.RegisterCenter;
 
-import IO.DealHeader.AcceptableHeader;
-import IO.DealHeader.ReadableHeader;
-import IO.DealHeader.impl.AcceptableHeaderImpl;
-import IO.DealHeader.impl.ReaderHeaderImpl;
 import com.alibaba.fastjson.JSONObject;
 
 import java.io.IOException;

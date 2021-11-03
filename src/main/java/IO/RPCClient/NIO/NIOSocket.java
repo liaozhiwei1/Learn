@@ -46,7 +46,7 @@ public class NIOSocket {
             while (iterator.hasNext()) {
                 SelectionKey next = iterator.next();
                 try {
-                    if (next.isConnectable()) {
+                    if (next.isAcceptable()) {
                         SelectableChannel channel = next.channel();
                         channel.register(selector, SelectionKey.OP_READ);
 

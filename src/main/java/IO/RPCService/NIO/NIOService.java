@@ -1,11 +1,14 @@
 package IO.RPCService.NIO;
 
+import IO.RPCService.BIO.RPCService;
+import com.alibaba.fastjson.JSONObject;
+
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.net.InetSocketAddress;
-import java.nio.channels.ClosedChannelException;
-import java.nio.channels.SelectionKey;
-import java.nio.channels.Selector;
-import java.nio.channels.SocketChannel;
+import java.nio.ByteBuffer;
+import java.nio.channels.*;
+import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 
 /**
@@ -26,37 +29,80 @@ public class NIOService {
     private Selector selector;
     private boolean start = false;
 
-    public NIOService() throws IOException {
-        this.selector = Selector.open();
+    private ServerSocketChannel serverSocketChannel;
 
+    public static void main(String[] args) throws IOException {
+        RPCService.register("BusinessService","127.0.0.1",8079);
+        NIOService rpcService = new NIOService();
+        rpcService.register();
+        rpcService.dealRequest();
     }
 
-    public void register(String ip, int address) throws IOException {
-        SocketChannel socketChannel = SocketChannel.open();
-        socketChannel.configureBlocking(false);
-        socketChannel = SocketChannel.open();
-        socketChannel.bind(new InetSocketAddress("127.0.0.1",8080));
-        socketChannel.configureBlocking(false);
-        socketChannel.register(selector,SelectionKey.OP_ACCEPT);
+    public void register() throws IOException {
+        serverSocketChannel = java.nio.channels.ServerSocketChannel.open();
+        serverSocketChannel.configureBlocking(false);
+        serverSocketChannel.socket().bind(new InetSocketAddress("127.0.0.1",8079));
+        serverSocketChannel.configureBlocking(false);
+        start = true;
+        selector = Selector.open();
+        serverSocketChannel.register(selector,SelectionKey.OP_ACCEPT);
     }
 
     public void dealRequest() {
         while (start) {
-            Iterator<SelectionKey> iterator = selector.selectedKeys().iterator();
-            while (iterator.hasNext()) {
-                SelectionKey next = iterator.next();
-                try {
-                    if (next.isAcceptable()){
-                        next.channel().register(selector,SelectionKey.OP_READ);
-                    }else if (next.isReadable()) {
-                        //TODO 读事件处理
+            try {
+                if (selector.selectNow() > 0) {
+                    Iterator<SelectionKey> iterator = selector.selectedKeys().iterator();
+                    while (iterator.hasNext()) {
+                        SelectionKey next = iterator.next();
+                        try {
+                            if (next.isAcceptable()) {
+                                SocketChannel accept = serverSocketChannel.accept();
+                                accept.configureBlocking(false);
+                                accept.register(selector,SelectionKey.OP_READ);
+                                iterator.remove();
+                            } else if (next.isReadable()) {
+                                SocketChannel channel = (SocketChannel) next.channel();
+                                new Really(channel).run();
+                                iterator.remove();
+                            }
+                        } catch (ClosedChannelException e) {
+                            e.printStackTrace();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                     }
-                } catch (ClosedChannelException e) {
-                    e.printStackTrace();
-                } finally {
-                    iterator.remove();
                 }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
+    class Really implements Runnable{
+
+        private SocketChannel channel;
+
+        public Really(SocketChannel channel) {
+            this.channel = channel;
+        }
+
+        @Override
+        public void run() {
+            ByteBuffer allocate = ByteBuffer.allocate(1024);
+            try {
+                channel.read(allocate);
+                allocate.flip();
+                byte[] bytes = new byte[allocate.limit()];
+                allocate.get(bytes);
+                RequestDto requestDto = JSONObject.parseObject(new String(bytes, StandardCharsets.UTF_8), RequestDto.class);
+                Class<?> aClass = Class.forName(requestDto.getClassName());
+                Object o = aClass.newInstance();
+                Method method = aClass.getMethod(requestDto.getMethod(), requestDto.getArgsType());
+                method.invoke(o,requestDto.getArgs());
+                channel.close();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
     }

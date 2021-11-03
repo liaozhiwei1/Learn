@@ -1,5 +1,6 @@
 package IO.RPCClient.BIO;
 
+import IO.RPCService.NIO.RequestDto;
 import IO.RegisterCenter.RegisterRequestDto;
 import IO.RegisterCenter.ServiceInfo;
 import com.alibaba.fastjson.JSONObject;
@@ -31,12 +32,14 @@ import java.util.Set;
 public class RPCClient {
 
     public static <T> T getRemoteProxyObj(final Class<?> serviceInterface) throws IOException, ClassNotFoundException {
+        ClassName annotation = serviceInterface.getAnnotation(ClassName.class);
+        String value = annotation.value();
         List<ServiceInfo> service = RPCClient.getService(serviceInterface.getSimpleName());
         int ran2 = (int) (Math.random()*(service.size()-2)+1);
         ServiceInfo serviceInfo = service.get(ran2);
         return (T) Proxy.newProxyInstance(serviceInterface.getClassLoader(),
                 new Class<?>[]{serviceInterface}
-                , new ReallyProxy(serviceInterface, new InetSocketAddress(serviceInfo.getIp(),serviceInfo.getProd())));
+                , new ReallyProxy(value, new InetSocketAddress(serviceInfo.getIp(),serviceInfo.getProd())));
     }
 
     public static List<ServiceInfo> getService(String serviceName) throws IOException, ClassNotFoundException {
@@ -54,41 +57,41 @@ public class RPCClient {
 
 class ReallyProxy implements InvocationHandler {
 
-    private Class<?> serviceInfo;
+    private String serviceInfo;
     private InetSocketAddress inetSocketAddress;
 
-    public ReallyProxy(Class<?> serviceInfo, InetSocketAddress inetSocketAddress) {
+    public ReallyProxy(String serviceInfo, InetSocketAddress inetSocketAddress) {
         this.serviceInfo = serviceInfo;
         this.inetSocketAddress = inetSocketAddress;
     }
 
     @Override
-    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+    public Object invoke(Object proxy, Method method, Object[] args){
         Socket socket = null;
-        ObjectOutputStream output = null;
-        ObjectInputStream input = null;
 
-        try{
+        try {
             socket = new Socket();
             socket.connect(inetSocketAddress);
+            RequestDto requestDto = new RequestDto();
+            requestDto.setClassName(serviceInfo);
+            requestDto.setMethod(method.getName());
+            requestDto.setArgsType(method.getParameterTypes());
+            requestDto.setArgs(args);
+            byte[] bytes = JSONObject.toJSONString(requestDto).getBytes(StandardCharsets.UTF_8);
 
-            output = new ObjectOutputStream(socket.getOutputStream());
-            output.writeUTF(serviceInfo.getSimpleName());//方法所在的类
-            output.writeUTF(method.getName());//方法的名
-            output.writeObject(method.getParameterTypes());//方法的入参类型
-            output.writeObject(args);
-            output.flush();
-
-            input = new ObjectInputStream(socket.getInputStream());
-            return input.readObject();
-
+            OutputStream outputStream = socket.getOutputStream();
+            outputStream.write(bytes);
+        }catch(Exception e){
+         e.printStackTrace();
         }finally{
-            if (socket!=null) socket.close();
-            if (output!=null) output.close();
-            if (input!=null) input.close();
+            if (socket!=null) {
+                try {
+                    socket.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
-
+        return null;
     }
-
-
 }
