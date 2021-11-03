@@ -15,7 +15,4 @@
             </dataSource>
         </environment>
     </environments>
-    <mappers>
-        <mapper resource="mapperxml/ImageProcessTemplateMapper.xml"/>
-    </mappers>
 </configuration>

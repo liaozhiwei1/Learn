@@ -1,12 +1,17 @@
 package IO.RPCService.BIO;
 
 import IO.BusinessService;
+import IO.RegisterCenter.RegisterRequestDto;
+import IO.RegisterCenter.ServiceInfo;
+import com.alibaba.fastjson.JSONObject;
 
 import java.io.*;
 import java.lang.reflect.Method;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -30,7 +35,7 @@ public class  RPCService {
     private Map<String, Class> map = new ConcurrentHashMap<>();
 
     public RPCService() throws IOException {
-        InetSocketAddress inetSocketAddress = new InetSocketAddress( 8080);
+        InetSocketAddress inetSocketAddress = new InetSocketAddress( 8079);
         this.socket = new ServerSocket();
         socket.bind(inetSocketAddress);
     }
@@ -75,8 +80,20 @@ public class  RPCService {
     }
 
     public static void main(String[] args) throws IOException {
+        RPCService.register("BusinessService","127.0.0.1",8079);
         RPCService rpcService = new RPCService();
         rpcService.register(BusinessService.class.getSimpleName(), BusinessService.class);
         new Thread(() -> rpcService.deal()).start();
+    }
+
+    public static void register(String serviceName,String hostName,int port) throws IOException {
+        Socket socket = new Socket();
+        RegisterRequestDto registerRequestDto = new RegisterRequestDto("register",serviceName,hostName,port);
+        byte[] bytes = JSONObject.toJSONString(registerRequestDto).getBytes(StandardCharsets.UTF_8);
+        socket.connect(new InetSocketAddress("127.0.0.1",8081));
+        OutputStream outputStream = socket.getOutputStream();
+        outputStream.write(bytes);
+        outputStream.flush();
+        socket.close();
     }
 }

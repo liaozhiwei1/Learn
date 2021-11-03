@@ -2,6 +2,8 @@ package IO.RPCClient.BIO;
 
 import IO.RPCClient.BusinessService;
 
+import java.io.IOException;
+
 /**
  * All rights Reserved, Designed By www.baozun.com
  *
@@ -17,7 +19,13 @@ import IO.RPCClient.BusinessService;
 public class streadClass {
 
     public static void main(String[] args){
-        BusinessService remoteProxyObj = RPCClient.getRemoteProxyObj(BusinessService.class, "127.0.0.1", 8080);
+        BusinessService remoteProxyObj = null;
+        try {
+            remoteProxyObj = RPCClient.getRemoteProxyObj(BusinessService.class);
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
         remoteProxyObj.doSomething("廖");
     }
+
 }

@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
  * @author: zhiwei.liao
  * @create: 2020-12-29 17:51:05
  **/
-/*@Component
+@Component
 public class MyFactorayBean implements FactoryBean {
 
     @Override
@@ -21,4 +21,4 @@ public class MyFactorayBean implements FactoryBean {
     public Class<?> getObjectType() {
         return null;
     }
-}*/
+}
