@@ -32,11 +32,8 @@ public class NIOSocket {
     public SocketChannel connect(String ip, int address) throws IOException {
         SocketChannel socketChannel = SocketChannel.open();
         socketChannel.configureBlocking(false);
-        if (socketChannel.connect(new InetSocketAddress(ip, address))) {
-            socketChannel.register(selector, SelectionKey.OP_ACCEPT);
-        } else {
-            socketChannel.register(selector, SelectionKey.OP_CONNECT);
-        };
+        socketChannel.connect(new InetSocketAddress(ip, address));
+        socketChannel.register(selector, SelectionKey.OP_ACCEPT);
         return socketChannel;
     }
 
@@ -46,7 +43,7 @@ public class NIOSocket {
             while (iterator.hasNext()) {
                 SelectionKey next = iterator.next();
                 try {
-                    if (next.isAcceptable()) {
+                    if (next.isConnectable()) {
                         SelectableChannel channel = next.channel();
                         channel.register(selector, SelectionKey.OP_READ);
 

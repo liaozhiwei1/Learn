@@ -2,12 +2,15 @@ package neety.DealHeader;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.util.CharsetUtil;
 
 import java.nio.charset.StandardCharsets;
 
+@ChannelHandler.Sharable
 public class  ChannelServerHeader extends ChannelInboundHandlerAdapter {
 
     /**
@@ -25,7 +28,8 @@ public class  ChannelServerHeader extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelReadComplete(ChannelHandlerContext ctx) {
-        ctx.writeAndFlush(Unpooled.copiedBuffer("111".getBytes(StandardCharsets.UTF_8)));
+        ctx.writeAndFlush(Unpooled.copiedBuffer("111".getBytes(StandardCharsets.UTF_8)))
+                .addListener(ChannelFutureListener.CLOSE);
     }
 
     @Override
