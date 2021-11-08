@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component;
 @Aspect
 public class springAop {
 
-    @Before("execution(public int Spring.service.*(..))")
+    @Before("execution(public * Spring.Service.ServiceA.*(..))")
     public void beforeNotify(){
         System.out.println("前置通知");
     }

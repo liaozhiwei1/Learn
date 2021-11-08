@@ -1,5 +1,9 @@
 package Atomic;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.atomic.AtomicStampedReference;
 
@@ -15,6 +19,13 @@ public class AtomicInter {
     AtomicReference<String > atomicReference = new AtomicReference<>("0");
     public static void main(String[] args) {
 
+        List list = new ArrayList();
+        list.add(1);
+        list.add(2);
+        Iterator iterator = list.iterator();
+        iterator.next();
+        iterator.remove();
+        iterator.next();
         AtomicInter atomicInter = new AtomicInter();
         atomicInter.noStampedReference();
         atomicInter.stampedReference();

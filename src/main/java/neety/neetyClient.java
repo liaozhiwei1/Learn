@@ -55,7 +55,7 @@ class ClientHandle extends SimpleChannelInboundHandler<ByteBuf> {
     }
 
     @Override
-    public void channelActive(ChannelHandlerContext ctx) throws Exception {
+    public void  channelActive(ChannelHandlerContext ctx) throws Exception {
         ctx.writeAndFlush(Unpooled.copiedBuffer("Hello netty".getBytes(StandardCharsets.UTF_8)));
         super.channelActive(ctx);
     }

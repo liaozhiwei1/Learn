@@ -14,7 +14,8 @@ import java.lang.annotation.Target;
  **/
 @Target({ElementType.TYPE,ElementType.FIELD,ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Autowrite {
+public @interface Autowired {
 
+    String value() default "";
 
 }
