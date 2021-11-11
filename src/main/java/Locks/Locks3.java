@@ -1,5 +1,6 @@
 package Locks;
 
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -15,7 +16,6 @@ public class Locks3 {
 
     volatile int a = 0;
     ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
-
     public static void main(String[] args) {
         Locks3 locks1 = new Locks3();
         for (int i = 0; i < 10; i++) {

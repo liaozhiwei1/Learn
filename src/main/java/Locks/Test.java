@@ -47,6 +47,8 @@ public class Test {
         new Thread(() -> {
             System.out.println("t2 开始");
             synchronized (lock) {
+
+                //MESA模型，不满足条件变量进入条件变量队列等待
                 while (demo.size() != 5){
                     try {
                         lock.wait();

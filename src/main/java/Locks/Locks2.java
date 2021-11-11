@@ -3,6 +3,7 @@ package Locks;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.LockSupport;
 import java.util.concurrent.locks.ReentrantLock;
@@ -16,7 +17,7 @@ import java.util.concurrent.locks.ReentrantLock;
  **/
 public class Locks2 {
     int a = 0;
-    Lock lock1 = new ReentrantLock();
+    static Lock lock1 = new ReentrantLock();
     public static void main(String[] args) {
         Locks2 locks = new Locks2();
 //        new Thread(()->{
